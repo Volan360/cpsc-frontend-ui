@@ -1,0 +1,62 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>Financial Institutions</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="actions-bar">
+      <button mat-raised-button color="primary" (click)="openCreateDialog()">
+        <mat-icon>add</mat-icon>
+        Add Institution
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+
+    <div *ngIf="!loading && institutions.length === 0" class="empty-state">
+      <mat-icon>account_balance</mat-icon>
+      <p>No institutions found. Create your first one!</p>
+    </div>
+
+    <table mat-table [dataSource]="institutions" *ngIf="!loading && institutions.length > 0">
+      <!-- Institution Name Column -->
+      <ng-container matColumnDef="institutionName">
+        <th mat-header-cell *matHeaderCellDef>Institution Name</th>
+        <td mat-cell *matCellDef="let institution">{{ institution.institutionName }}</td>
+      </ng-container>
+
+      <!-- Current Balance Column -->
+      <ng-container matColumnDef="currentBalance">
+        <th mat-header-cell *matHeaderCellDef>Current Balance</th>
+        <td mat-cell *matCellDef="let institution">{{ formatCurrency(institution.currentBalance) }}</td>
+      </ng-container>
+
+      <!-- Created At Column -->
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Created</th>
+        <td mat-cell *matCellDef="let institution">{{ formatDate(institution.createdAt) }}</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let institution">
+          <button mat-icon-button (click)="viewInstitution(institution)" matTooltip="View Details">
+            <mat-icon>visibility</mat-icon>
+          </button>
+          <button mat-icon-button (click)="editInstitution(institution, $event)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteInstitution(institution, $event)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="viewInstitution(row)" class="clickable-row"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

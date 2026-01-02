@@ -31,6 +31,14 @@ export interface ConfirmSignUpRequest {
   confirmationCode: string;
 }
 
+export interface ResendCodeRequest {
+  email: string;
+}
+
+export interface ResendCodeResponse {
+  message: string;
+}
+
 export interface UserProfile {
   email: string;
   firstName?: string;

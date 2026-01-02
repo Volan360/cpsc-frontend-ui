@@ -1,0 +1,111 @@
+<div class="header-actions">
+  <button mat-icon-button (click)="goBack()">
+    <mat-icon>arrow_back</mat-icon>
+  </button>
+</div>
+
+<mat-card *ngIf="institution" class="institution-summary">
+  <mat-card-header>
+    <mat-card-title>{{ institution.institutionName }}</mat-card-title>
+    <mat-card-subtitle>Created {{ formatDate(institution.createdAt) }}</mat-card-subtitle>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="balance-info">
+      <div class="balance-item">
+        <span class="label">Starting Balance:</span>
+        <span class="value">{{ formatCurrency(institution.startingBalance) }}</span>
+      </div>
+      <div class="balance-item current">
+        <span class="label">Current Balance:</span>
+        <span class="value" [class.negative]="getCurrentBalance() < 0">
+          {{ formatCurrency(getCurrentBalance()) }}
+        </span>
+      </div>
+    </div>
+  </mat-card-content>
+</mat-card>
+
+<mat-card class="transactions-card">
+  <mat-card-header>
+    <mat-card-title>Transactions</mat-card-title>
+  </mat-card-header>
+  
+  <mat-card-content>
+    <div class="actions-bar">
+      <button mat-raised-button color="primary" (click)="openCreateTransactionDialog()">
+        <mat-icon>add</mat-icon>
+        Add Transaction
+      </button>
+    </div>
+
+    <div *ngIf="loading" class="loading-container">
+      <mat-progress-spinner mode="indeterminate"></mat-progress-spinner>
+    </div>
+
+    <div *ngIf="!loading && transactions.length === 0" class="empty-state">
+      <mat-icon>receipt_long</mat-icon>
+      <p>No transactions yet. Add your first transaction!</p>
+    </div>
+
+    <table mat-table [dataSource]="transactions" *ngIf="!loading && transactions.length > 0">
+      <!-- Type Column -->
+      <ng-container matColumnDef="type">
+        <th mat-header-cell *matHeaderCellDef>Type</th>
+        <td mat-cell *matCellDef="let transaction">
+          <mat-chip [class]="getTransactionClass(transaction.type)">
+            <mat-icon *ngIf="transaction.type === 'DEPOSIT'">arrow_upward</mat-icon>
+            <mat-icon *ngIf="transaction.type === 'WITHDRAWAL'">arrow_downward</mat-icon>
+            {{ transaction.type }}
+          </mat-chip>
+        </td>
+      </ng-container>
+
+      <!-- Amount Column -->
+      <ng-container matColumnDef="amount">
+        <th mat-header-cell *matHeaderCellDef>Amount</th>
+        <td mat-cell *matCellDef="let transaction" [class]="getTransactionClass(transaction.type)">
+          {{ transaction.type === 'DEPOSIT' ? '+' : '-' }}{{ formatCurrency(transaction.amount) }}
+        </td>
+      </ng-container>
+
+      <!-- Description Column -->
+      <ng-container matColumnDef="description">
+        <th mat-header-cell *matHeaderCellDef>Description</th>
+        <td mat-cell *matCellDef="let transaction">
+          {{ transaction.description || '-' }}
+        </td>
+      </ng-container>
+
+      <!-- Tags Column -->
+      <ng-container matColumnDef="tags">
+        <th mat-header-cell *matHeaderCellDef>Tags</th>
+        <td mat-cell *matCellDef="let transaction">
+          <mat-chip-set *ngIf="transaction.tags && transaction.tags.length > 0">
+            <mat-chip *ngFor="let tag of transaction.tags">{{ tag }}</mat-chip>
+          </mat-chip-set>
+          <span *ngIf="!transaction.tags || transaction.tags.length === 0">-</span>
+        </td>
+      </ng-container>
+
+      <!-- Created At Column -->
+      <ng-container matColumnDef="createdAt">
+        <th mat-header-cell *matHeaderCellDef>Date</th>
+        <td mat-cell *matCellDef="let transaction">{{ formatDate(transaction.createdAt) }}</td>
+      </ng-container>
+
+      <!-- Actions Column -->
+      <ng-container matColumnDef="actions">
+        <th mat-header-cell *matHeaderCellDef>Actions</th>
+        <td mat-cell *matCellDef="let transaction">
+          <button mat-icon-button color="warn" (click)="deleteTransaction(transaction, $event)" matTooltip="Delete">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </td>
+      </ng-container>
+
+      <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+      <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+    </table>
+  </mat-card-content>
+</mat-card>

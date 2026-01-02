@@ -1,0 +1,121 @@
+.header-actions {
+  margin: 20px;
+}
+
+mat-card {
+  margin: 20px;
+}
+
+.institution-summary {
+  .balance-info {
+    display: flex;
+    gap: 40px;
+    margin-top: 16px;
+
+    .balance-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      .label {
+        font-size: 14px;
+        color: var(--mdc-theme-text-secondary-on-background);
+      }
+
+      .value {
+        font-size: 24px;
+        font-weight: 500;
+
+        &.negative {
+          color: var(--warn-color);
+        }
+      }
+
+      &.current .value {
+        color: var(--primary-color);
+        font-weight: 600;
+      }
+    }
+  }
+}
+
+.transactions-card {
+  .actions-bar {
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: flex-end;
+
+    button {
+      mat-icon {
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    padding: 40px;
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 40px;
+    color: var(--mdc-theme-text-hint-on-background);
+
+    mat-icon {
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
+      margin-bottom: 16px;
+      opacity: 0.5;
+    }
+
+    p {
+      font-size: 16px;
+      margin: 0;
+    }
+  }
+
+  table {
+    width: 100%;
+    margin-top: 20px;
+
+    th {
+      font-weight: 600;
+    }
+
+    td, th {
+      padding: 12px;
+    }
+
+    .deposit {
+      color: var(--success-color, #4caf50);
+      font-weight: 500;
+
+      mat-chip {
+        background-color: rgba(76, 175, 80, 0.1);
+        color: var(--success-color, #4caf50);
+      }
+    }
+
+    .withdrawal {
+      color: var(--warn-color, #f44336);
+      font-weight: 500;
+
+      mat-chip {
+        background-color: rgba(244, 67, 54, 0.1);
+        color: var(--warn-color, #f44336);
+      }
+    }
+
+    mat-chip {
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+        margin-right: 4px;
+      }
+    }
+  }
+}

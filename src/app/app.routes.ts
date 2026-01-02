@@ -12,6 +12,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'institutions',
+    loadChildren: () => import('./features/institutions/institutions.routes').then(m => m.INSTITUTIONS_ROUTES),
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     redirectTo: '/auth/sign-in',
     pathMatch: 'full'

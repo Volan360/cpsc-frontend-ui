@@ -1,0 +1,35 @@
+<h2 mat-dialog-title>{{ isEditMode ? 'Edit Institution' : 'Create New Institution' }}</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="institutionForm">
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Institution Name</mat-label>
+      <input matInput formControlName="institutionName" placeholder="e.g., Chase Bank" required>
+      <mat-error *ngIf="institutionForm.get('institutionName')?.hasError('required')">
+        Institution name is required
+      </mat-error>
+      <mat-error *ngIf="institutionForm.get('institutionName')?.hasError('maxlength')">
+        Institution name cannot exceed 100 characters
+      </mat-error>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Starting Balance</mat-label>
+      <input matInput type="number" formControlName="startingBalance" placeholder="0.00" required step="0.01" (focus)="onStartingBalanceFocus()">
+      <span matPrefix>$&nbsp;</span>
+      <mat-error *ngIf="institutionForm.get('startingBalance')?.hasError('required')">
+        Starting balance is required
+      </mat-error>
+      <mat-error *ngIf="institutionForm.get('startingBalance')?.hasError('min')">
+        Starting balance cannot be negative
+      </mat-error>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()" [disabled]="submitting">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onSubmit()" [disabled]="!institutionForm.valid || submitting">
+    {{ submitting ? (isEditMode ? 'Updating...' : 'Creating...') : (isEditMode ? 'Update' : 'Create') }}
+  </button>
+</mat-dialog-actions>
