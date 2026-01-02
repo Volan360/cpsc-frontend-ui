@@ -1,0 +1,89 @@
+<div class="dashboard-container">
+  <mat-toolbar color="primary" class="toolbar">
+    <span class="toolbar-title">CPSC Cornerstone</span>
+    <span class="spacer"></span>
+    
+    <button mat-icon-button [matMenuTriggerFor]="userMenu">
+      <mat-icon>account_circle</mat-icon>
+    </button>
+    
+    <mat-menu #userMenu="matMenu">
+      <div class="user-info" mat-menu-item disabled>
+        <div class="user-email">{{ currentUser()?.email || 'User' }}</div>
+        <div class="user-name" *ngIf="currentUser()?.firstName || currentUser()?.lastName">
+          {{ currentUser()?.firstName }} {{ currentUser()?.lastName }}
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <button mat-menu-item (click)="signOut()">
+        <mat-icon>logout</mat-icon>
+        <span>Sign Out</span>
+      </button>
+    </mat-menu>
+  </mat-toolbar>
+
+  <div class="content">
+    <div class="welcome-section">
+      <h1>Welcome to CPSC Cornerstone</h1>
+      <p class="subtitle">Your dashboard is ready!</p>
+    </div>
+
+    <div class="cards-grid">
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="card-icon">analytics</mat-icon>
+          <mat-card-title>Analytics</mat-card-title>
+          <mat-card-subtitle>View your analytics data</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Access detailed analytics and insights about your data.</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary">View Analytics</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="card-icon">settings</mat-icon>
+          <mat-card-title>Settings</mat-card-title>
+          <mat-card-subtitle>Manage your preferences</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Configure your account settings and preferences.</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary">Open Settings</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="card-icon">description</mat-icon>
+          <mat-card-title>Reports</mat-card-title>
+          <mat-card-subtitle>Generate and view reports</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Create custom reports and export your data.</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary">View Reports</button>
+        </mat-card-actions>
+      </mat-card>
+
+      <mat-card class="dashboard-card">
+        <mat-card-header>
+          <mat-icon mat-card-avatar class="card-icon">help</mat-icon>
+          <mat-card-title>Help & Support</mat-card-title>
+          <mat-card-subtitle>Get assistance</mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p>Access documentation and contact support.</p>
+        </mat-card-content>
+        <mat-card-actions>
+          <button mat-button color="primary">Get Help</button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div>

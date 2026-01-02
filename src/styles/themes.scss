@@ -1,0 +1,42 @@
+@use '@angular/material' as mat;
+
+// Include the common styles for Angular Material
+@include mat.core();
+
+// Define the theme using Material's built-in palettes
+$cpsc-primary: mat.m2-define-palette(mat.$m2-blue-palette, 600);
+$cpsc-accent: mat.m2-define-palette(mat.$m2-pink-palette, 500);
+$cpsc-warn: mat.m2-define-palette(mat.$m2-red-palette);
+
+// Create the theme
+$cpsc-theme: mat.m2-define-light-theme((
+  color: (
+    primary: $cpsc-primary,
+    accent: $cpsc-accent,
+    warn: $cpsc-warn,
+  ),
+  typography: mat.m2-define-typography-config(),
+  density: 0,
+));
+
+// Include theme styles for all components
+@include mat.all-component-themes($cpsc-theme);
+
+// Custom CSS variables for easy theming
+:root {
+  --primary-color: #1e88e5;
+  --primary-light: #64b5f6;
+  --primary-dark: #1565c0;
+  --accent-color: #e91e63;
+  --accent-light: #f06292;
+  --accent-dark: #c2185b;
+  --background-color: #fafafa;
+  --card-background: #ffffff;
+  --text-primary: rgba(0, 0, 0, 0.87);
+  --text-secondary: rgba(0, 0, 0, 0.54);
+  --border-color: #e0e0e0;
+  --success-color: #4caf50;
+  --error-color: #f44336;
+  --warning-color: #ff9800;
+  --info-color: #2196f3;
+}

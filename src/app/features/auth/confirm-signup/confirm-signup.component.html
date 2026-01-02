@@ -1,0 +1,68 @@
+<div class="confirm-container">
+  <mat-card class="confirm-card">
+    <mat-card-header>
+      <mat-card-title class="text-center full-width">
+        <h1>Confirm Your Account</h1>
+        <p class="subtitle">Enter the confirmation code sent to your email</p>
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="confirmForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email</mat-label>
+          <input 
+            matInput 
+            type="email" 
+            formControlName="email"
+            placeholder="you@example.com"
+            autocomplete="email">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="confirmForm.get('email')?.invalid && confirmForm.get('email')?.touched">
+            {{ getErrorMessage('email') }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Confirmation Code</mat-label>
+          <input 
+            matInput 
+            type="text" 
+            formControlName="confirmationCode"
+            placeholder="Enter 6-digit code"
+            maxlength="6">
+          <mat-icon matPrefix>verified_user</mat-icon>
+          <mat-error *ngIf="confirmForm.get('confirmationCode')?.invalid && confirmForm.get('confirmationCode')?.touched">
+            {{ getErrorMessage('confirmationCode') }}
+          </mat-error>
+        </mat-form-field>
+
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit"
+          class="full-width submit-button"
+          [disabled]="loading()">
+          <span *ngIf="!loading()">Confirm Account</span>
+          <mat-spinner *ngIf="loading()" diameter="20"></mat-spinner>
+        </button>
+
+        <button 
+          mat-stroked-button 
+          type="button"
+          class="full-width resend-button"
+          (click)="resendCode()"
+          [disabled]="resending()">
+          <span *ngIf="!resending()">Resend Code</span>
+          <mat-spinner *ngIf="resending()" diameter="20"></mat-spinner>
+        </button>
+      </form>
+
+      <div class="additional-actions">
+        <p class="text-center">
+          <a routerLink="/auth/sign-in" class="link">Back to Sign In</a>
+        </p>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

@@ -1,0 +1,24 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Installing dependencies...
+      - npm ci
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building for environment $BUILD_ENV
+      - npm run build:$BUILD_ENV
+  post_build:
+    commands:
+      - echo Build completed on `date`
+
+artifacts:
+  files:
+    - '**/*'
+  base-directory: 'dist/cpsc-frontend-ui/browser'
+
+cache:
+  paths:
+    - 'node_modules/**/*'

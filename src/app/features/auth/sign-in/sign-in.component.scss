@@ -1,0 +1,87 @@
+.sign-in-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+  padding: 20px;
+}
+
+.sign-in-card {
+  width: 100%;
+  max-width: 450px;
+  padding: 20px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+mat-card-header {
+  display: block;
+  margin-bottom: 24px;
+}
+
+h1 {
+  margin: 0;
+  color: var(--primary-color);
+  font-size: 2rem;
+  font-weight: 500;
+}
+
+.subtitle {
+  margin: 8px 0 0 0;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  font-weight: 400;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+mat-form-field {
+  margin-bottom: 8px;
+}
+
+.submit-button {
+  margin-top: 16px;
+  height: 48px;
+  font-size: 1rem;
+  font-weight: 500;
+
+  mat-spinner {
+    margin: 0 auto;
+  }
+}
+
+.additional-actions {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+
+  p {
+    margin: 0;
+    color: var(--text-secondary);
+  }
+
+  .link {
+    color: var(--primary-color);
+    text-decoration: none;
+    font-weight: 500;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+// Responsive design
+@media (max-width: 600px) {
+  .sign-in-card {
+    padding: 16px;
+  }
+
+  h1 {
+    font-size: 1.5rem;
+  }
+}
