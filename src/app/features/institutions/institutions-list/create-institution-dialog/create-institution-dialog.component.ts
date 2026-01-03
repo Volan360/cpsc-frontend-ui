@@ -8,6 +8,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { InstitutionService } from '@core/services/institution.service';
 import { InstitutionResponse } from '@core/models/institution.models';
+import { NotificationService } from '@core/services/notification.service';
+import { VALIDATION } from '@core/constants/app.constants';
 
 @Component({
   selector: 'app-create-institution-dialog',
@@ -33,7 +35,7 @@ export class CreateInstitutionDialogComponent {
     private fb: FormBuilder,
     private institutionService: InstitutionService,
     private dialogRef: MatDialogRef<CreateInstitutionDialogComponent>,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     @Inject(MAT_DIALOG_DATA) public data?: { institution: InstitutionResponse }
   ) {
     this.isEditMode = !!data?.institution;
@@ -51,24 +53,24 @@ export class CreateInstitutionDialogComponent {
       if (this.isEditMode && this.data?.institution) {
         this.institutionService.editInstitution(this.data.institution.institutionId, this.institutionForm.value).subscribe({
           next: (response) => {
-            this.snackBar.open('Institution updated successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Institution updated successfully');
             this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Error updating institution:', error);
-            this.snackBar.open(error.error?.error || 'Failed to update institution', 'Close', { duration: 3000 });
+            this.notificationService.error(error.error?.error || 'Failed to update institution');
             this.submitting = false;
           }
         });
       } else {
         this.institutionService.createInstitution(this.institutionForm.value).subscribe({
           next: (response) => {
-            this.snackBar.open('Institution created successfully', 'Close', { duration: 3000 });
+            this.notificationService.success('Institution created successfully');
             this.dialogRef.close(response);
           },
           error: (error) => {
             console.error('Error creating institution:', error);
-            this.snackBar.open(error.error?.error || 'Failed to create institution', 'Close', { duration: 3000 });
+            this.notificationService.error(error.error?.error || 'Failed to create institution');
             this.submitting = false;
           }
         });

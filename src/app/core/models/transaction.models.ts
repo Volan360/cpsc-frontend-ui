@@ -8,6 +8,7 @@ export interface CreateTransactionRequest {
   amount: number;
   tags?: string[];
   description?: string;
+  transactionDate?: number;  // Optional UNIX timestamp
 }
 
 export interface TransactionResponse {
@@ -17,5 +18,6 @@ export interface TransactionResponse {
   amount: number;
   tags?: string[];
   description?: string;
+  transactionDate: number;
   createdAt: number;
 }

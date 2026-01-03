@@ -1,0 +1,14 @@
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+  
+  &:first-of-type {
+    margin-top: 8px;
+  }
+}
+
+mat-dialog-content {
+  min-width: 400px;
+  padding-top: 20px;
+  overflow: visible;
+}

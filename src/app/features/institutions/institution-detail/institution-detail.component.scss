@@ -43,7 +43,13 @@ mat-card {
   .actions-bar {
     margin-bottom: 20px;
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
+    align-items: center;
+
+    .filter-actions {
+      display: flex;
+      gap: 12px;
+    }
 
     button {
       mat-icon {

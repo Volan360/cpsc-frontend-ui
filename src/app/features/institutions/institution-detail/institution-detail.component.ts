@@ -15,6 +15,10 @@ import { TransactionService } from '@core/services/transaction.service';
 import { InstitutionResponse } from '@core/models/institution.models';
 import { TransactionResponse } from '@core/models/transaction.models';
 import { CreateTransactionDialogComponent } from './create-transaction-dialog/create-transaction-dialog.component';
+import { FilterTransactionsDialogComponent, TransactionFilter } from './filter-transactions-dialog/filter-transactions-dialog.component';
+import { NotificationService } from '@core/services/notification.service';
+import { formatDate, formatCurrency } from '@core/utils/date.utils';
+import { DIALOG_WIDTHS } from '@core/constants/app.constants';
 
 @Component({
   selector: 'app-institution-detail',
@@ -37,6 +41,8 @@ import { CreateTransactionDialogComponent } from './create-transaction-dialog/cr
 export class InstitutionDetailComponent implements OnInit {
   institution?: InstitutionResponse;
   transactions: TransactionResponse[] = [];
+  filteredTransactions: TransactionResponse[] = [];
+  activeFilter?: TransactionFilter;
   displayedColumns: string[] = ['type', 'amount', 'description', 'tags', 'createdAt', 'actions'];
   loading = true;
   institutionId!: string;
@@ -46,7 +52,7 @@ export class InstitutionDetailComponent implements OnInit {
     private router: Router,
     private institutionService: InstitutionService,
     private transactionService: TransactionService,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
 
@@ -64,7 +70,7 @@ export class InstitutionDetailComponent implements OnInit {
         this.institution = response.institutions.find(i => i.institutionId === this.institutionId);
         
         if (!this.institution) {
-          this.snackBar.open('Institution not found', 'Close', { duration: 3000 });
+          this.notificationService.error('Institution not found');
           this.router.navigate(['/institutions']);
           return;
         }
@@ -73,7 +79,7 @@ export class InstitutionDetailComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading institution:', error);
-        this.snackBar.open('Failed to load institution', 'Close', { duration: 3000 });
+        this.notificationService.error('Failed to load institution');
         this.loading = false;
       }
     });
@@ -83,11 +89,12 @@ export class InstitutionDetailComponent implements OnInit {
     this.transactionService.getInstitutionTransactions(this.institutionId).subscribe({
       next: (transactions) => {
         this.transactions = transactions;
+        this.applyFilter();
         this.loading = false;
       },
       error: (error) => {
         console.error('Error loading transactions:', error);
-        this.snackBar.open('Failed to load transactions', 'Close', { duration: 3000 });
+        this.notificationService.error('Failed to load transactions');
         this.loading = false;
       }
     });
@@ -95,7 +102,7 @@ export class InstitutionDetailComponent implements OnInit {
 
   openCreateTransactionDialog(): void {
     const dialogRef = this.dialog.open(CreateTransactionDialogComponent, {
-      width: '500px',
+      width: DIALOG_WIDTHS.MEDIUM,
       data: { institutionId: this.institutionId }
     });
 
@@ -112,12 +119,12 @@ export class InstitutionDetailComponent implements OnInit {
     if (confirm('Are you sure you want to delete this transaction?')) {
       this.transactionService.deleteTransaction(this.institutionId, transaction.transactionId).subscribe({
         next: () => {
-          this.snackBar.open('Transaction deleted successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('Transaction deleted successfully');
           this.loadTransactions();
         },
         error: (error) => {
           console.error('Error deleting transaction:', error);
-          this.snackBar.open('Failed to delete transaction', 'Close', { duration: 3000 });
+          this.notificationService.error('Failed to delete transaction');
         }
       });
     }
@@ -143,18 +150,69 @@ export class InstitutionDetailComponent implements OnInit {
     return balance;
   }
 
-  formatDate(timestamp: number): string {
-    return new Date(timestamp * 1000).toLocaleString();
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  }
-
   getTransactionClass(type: string): string {
     return type === 'DEPOSIT' ? 'deposit' : 'withdrawal';
+  }
+
+  formatDate = formatDate;
+  formatCurrency = formatCurrency;
+
+  openFilterDialog(): void {
+    const dialogRef = this.dialog.open(FilterTransactionsDialogComponent, {
+      width: DIALOG_WIDTHS.MEDIUM
+    });
+
+    dialogRef.afterClosed().subscribe((filter: TransactionFilter | undefined) => {
+      if (filter) {
+        this.activeFilter = filter;
+        this.applyFilter();
+      }
+    });
+  }
+
+  clearFilter(): void {
+    this.activeFilter = undefined;
+    this.applyFilter();
+  }
+
+  private applyFilter(): void {
+    if (!this.activeFilter) {
+      this.filteredTransactions = [...this.transactions];
+      return;
+    }
+
+    this.filteredTransactions = this.transactions.filter(transaction => {
+      const transactionDate = new Date(transaction.transactionDate * 1000);
+      // Set to start of day for comparison
+      transactionDate.setHours(0, 0, 0, 0);
+
+      if (this.activeFilter!.filterType === 'before' && this.activeFilter!.endDate) {
+        const endDate = new Date(this.activeFilter!.endDate);
+        endDate.setHours(0, 0, 0, 0);
+        return transactionDate < endDate;
+      }
+
+      if (this.activeFilter!.filterType === 'after' && this.activeFilter!.startDate) {
+        const startDate = new Date(this.activeFilter!.startDate);
+        startDate.setHours(23, 59, 59, 999);
+        return transactionDate > startDate;
+      }
+
+      if (this.activeFilter!.filterType === 'between' && this.activeFilter!.startDate && this.activeFilter!.endDate) {
+        const startDate = new Date(this.activeFilter!.startDate);
+        startDate.setHours(0, 0, 0, 0);
+        const endDate = new Date(this.activeFilter!.endDate);
+        endDate.setHours(23, 59, 59, 999);
+        return transactionDate >= startDate && transactionDate <= endDate;
+      }
+
+      if (this.activeFilter!.filterType === 'on' && this.activeFilter!.startDate) {
+        const filterDate = new Date(this.activeFilter!.startDate);
+        filterDate.setHours(0, 0, 0, 0);
+        return transactionDate.getTime() === filterDate.getTime();
+      }
+
+      return true;
+    });
   }
 }

@@ -10,9 +10,13 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatAutocompleteModule, MatAutocompleteTrigger } from '@angular/material/autocomplete';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MatNativeDateModule } from '@angular/material/core';
 import { TransactionService } from '@core/services/transaction.service';
 import { InstitutionService } from '@core/services/institution.service';
 import { TransactionType } from '@core/models/transaction.models';
+import { NotificationService } from '@core/services/notification.service';
+import { getDefaultDate, dateToUnixTimestamp, getMaxDate } from '@core/utils/date.utils';
 import { Observable, map, startWith } from 'rxjs';
 
 @Component({
@@ -30,7 +34,9 @@ import { Observable, map, startWith } from 'rxjs';
     MatChipsModule,
     MatIconModule,
     MatAutocompleteModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatDatepickerModule,
+    MatNativeDateModule
   ],
   templateUrl: './create-transaction-dialog.component.html',
   styleUrls: ['./create-transaction-dialog.component.scss']
@@ -43,6 +49,7 @@ export class CreateTransactionDialogComponent implements OnInit {
   tagControl = new FormControl('');
   allTags: string[] = [];
   filteredTags$: Observable<string[]>;
+  maxDate = getMaxDate(); // Prevent future dates
 
   @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
 
@@ -51,13 +58,14 @@ export class CreateTransactionDialogComponent implements OnInit {
     private transactionService: TransactionService,
     private institutionService: InstitutionService,
     private dialogRef: MatDialogRef<CreateTransactionDialogComponent>,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     @Inject(MAT_DIALOG_DATA) public data: { institutionId: string }
   ) {
     this.transactionForm = this.fb.group({
       type: [TransactionType.DEPOSIT, Validators.required],
       amount: [0, [Validators.required, Validators.min(0.01)]],
-      description: ['', Validators.maxLength(500)]
+      description: ['', Validators.maxLength(500)],
+      transactionDate: [getDefaultDate()]  // Default to today's date
     });
 
     // Set up autocomplete filtering
@@ -155,19 +163,27 @@ export class CreateTransactionDialogComponent implements OnInit {
     if (this.transactionForm.valid && !this.submitting) {
       this.submitting = true;
       
-      const requestData = {
-        ...this.transactionForm.value,
+      const formValue = this.transactionForm.value;
+      const requestData: any = {
+        type: formValue.type,
+        amount: formValue.amount,
+        description: formValue.description || undefined,
         tags: this.tags.length > 0 ? this.tags : undefined
       };
 
+      // Convert date to UNIX timestamp if provided
+      if (formValue.transactionDate) {
+        requestData.transactionDate = dateToUnixTimestamp(formValue.transactionDate);
+      }
+
       this.transactionService.createTransaction(this.data.institutionId, requestData).subscribe({
         next: (response) => {
-          this.snackBar.open('Transaction created successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('Transaction created successfully');
           this.dialogRef.close(response);
         },
         error: (error) => {
           console.error('Error creating transaction:', error);
-          this.snackBar.open(error.error?.error || 'Failed to create transaction', 'Close', { duration: 3000 });
+          this.notificationService.error(error.error?.error || 'Failed to create transaction');
           this.submitting = false;
         }
       });

@@ -27,6 +27,14 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Transaction Date (optional)</mat-label>
+      <input matInput [matDatepicker]="picker" formControlName="transactionDate" [max]="maxDate" placeholder="Select date">
+      <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+      <mat-datepicker #picker></mat-datepicker>
+      <mat-hint>Leave empty to use current date/time</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
       <mat-label>Description (optional)</mat-label>
       <textarea matInput formControlName="description" rows="3" placeholder="Transaction details"></textarea>
       <mat-error *ngIf="transactionForm.get('description')?.hasError('maxlength')">

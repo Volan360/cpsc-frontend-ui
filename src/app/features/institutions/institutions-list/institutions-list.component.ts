@@ -12,6 +12,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { InstitutionService } from '@core/services/institution.service';
 import { InstitutionResponse } from '@core/models/institution.models';
 import { CreateInstitutionDialogComponent } from './create-institution-dialog/create-institution-dialog.component';
+import { NotificationService } from '@core/services/notification.service';
+import { formatDate, formatCurrency } from '@core/utils/date.utils';
 
 @Component({
   selector: 'app-institutions-list',
@@ -39,7 +41,7 @@ export class InstitutionsListComponent implements OnInit {
   constructor(
     private institutionService: InstitutionService,
     private router: Router,
-    private snackBar: MatSnackBar,
+    private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
 
@@ -61,7 +63,7 @@ export class InstitutionsListComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error loading institutions:', error);
-        this.snackBar.open('Failed to load institutions', 'Close', { duration: 3000 });
+        this.notificationService.error('Failed to load institutions');
         this.loading = false;
       }
     });
@@ -104,25 +106,17 @@ export class InstitutionsListComponent implements OnInit {
     if (confirm(`Are you sure you want to delete ${institution.institutionName}?`)) {
       this.institutionService.deleteInstitution(institution.institutionId).subscribe({
         next: () => {
-          this.snackBar.open('Institution deleted successfully', 'Close', { duration: 3000 });
+          this.notificationService.success('Institution deleted successfully');
           this.loadInstitutions();
         },
         error: (error) => {
           console.error('Error deleting institution:', error);
-          this.snackBar.open('Failed to delete institution', 'Close', { duration: 3000 });
+          this.notificationService.error('Failed to delete institution');
         }
       });
     }
   }
 
-  formatDate(timestamp: number): string {
-    return new Date(timestamp * 1000).toLocaleDateString();
-  }
-
-  formatCurrency(amount: number): string {
-    return new Intl.NumberFormat('en-US', {
-      style: 'currency',
-      currency: 'USD'
-    }).format(amount);
-  }
+  formatDate = formatDate;
+  formatCurrency = formatCurrency;
 }
