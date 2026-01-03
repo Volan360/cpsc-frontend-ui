@@ -11,6 +11,7 @@ import { MatRadioModule } from '@angular/material/radio';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { getDefaultDate, getMaxDate } from '@core/utils/date.utils';
 import { TransactionService } from '@core/services/transaction.service';
 import { InstitutionService } from '@core/services/institution.service';
@@ -19,6 +20,8 @@ import { MAT_DIALOG_DATA } from '@angular/material/dialog';
 
 export type FilterType = 'before' | 'after' | 'between' | 'on';
 export type TagFilterMode = 'all' | 'any';
+export type AmountFilterType = 'less' | 'greater' | 'between';
+export type TransactionType = 'DEPOSIT' | 'WITHDRAWAL';
 
 export interface TransactionFilter {
   filterType: FilterType;
@@ -27,6 +30,10 @@ export interface TransactionFilter {
   tags?: string[];
   noTags?: boolean;
   tagFilterMode?: TagFilterMode;
+  types?: TransactionType[];
+  amountFilterType?: AmountFilterType;
+  minAmount?: number;
+  maxAmount?: number;
 }
 
 @Component({
@@ -44,7 +51,8 @@ export interface TransactionFilter {
     MatRadioModule,
     MatChipsModule,
     MatIconModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MatExpansionModule
   ],
   templateUrl: './filter-transactions-dialog.component.html',
   styleUrls: ['./filter-transactions-dialog.component.scss']
@@ -66,9 +74,18 @@ export class FilterTransactionsDialogComponent implements OnInit {
     const existingFilter = this.data.existingFilter;
     
     this.filterForm = this.fb.group({
-      filterType: [existingFilter?.filterType || 'between', Validators.required],
+      dateFilterEnabled: [existingFilter?.startDate !== undefined || existingFilter?.endDate !== undefined],
+      filterType: [existingFilter?.filterType || 'on', Validators.required],
       startDate: [existingFilter?.startDate || getDefaultDate()],
       endDate: [existingFilter?.endDate || getDefaultDate()],
+      typeFilterEnabled: [existingFilter?.types !== undefined && existingFilter.types.length > 0],
+      depositSelected: [existingFilter?.types?.includes('DEPOSIT') || false],
+      withdrawalSelected: [existingFilter?.types?.includes('WITHDRAWAL') || false],
+      amountFilterEnabled: [existingFilter?.minAmount !== undefined || existingFilter?.maxAmount !== undefined],
+      amountFilterType: [existingFilter?.amountFilterType || 'between'],
+      minAmount: [existingFilter?.minAmount || null],
+      maxAmount: [existingFilter?.maxAmount || null],
+      tagFilterEnabled: [existingFilter?.tags !== undefined || existingFilter?.noTags === true],
       noTags: [existingFilter?.noTags || false],
       tagFilterMode: [existingFilter?.tagFilterMode || 'any']
     });
@@ -86,10 +103,63 @@ export class FilterTransactionsDialogComponent implements OnInit {
     });
 
     // Initialize validators
-    this.updateValidators('between');
+    this.updateValidators('on');
+
+    // Update amount validators when amount filter type changes
+    this.filterForm.get('amountFilterType')?.valueChanges.subscribe(amountFilterType => {
+      this.updateAmountValidators(amountFilterType);
+    });
+
+    // Initialize amount validators
+    this.updateAmountValidators(this.filterForm.get('amountFilterType')?.value);
 
     // Load all tags from transactions
     this.loadAvailableTags();
+
+    // Auto-enable filters when user makes selections
+    this.filterForm.get('depositSelected')?.valueChanges.subscribe(() => {
+      if (this.filterForm.get('depositSelected')?.value || this.filterForm.get('withdrawalSelected')?.value) {
+        this.filterForm.get('typeFilterEnabled')?.setValue(true, { emitEvent: false });
+      }
+    });
+
+    this.filterForm.get('withdrawalSelected')?.valueChanges.subscribe(() => {
+      if (this.filterForm.get('depositSelected')?.value || this.filterForm.get('withdrawalSelected')?.value) {
+        this.filterForm.get('typeFilterEnabled')?.setValue(true, { emitEvent: false });
+      }
+    });
+
+    this.filterForm.get('filterType')?.valueChanges.subscribe(() => {
+      this.filterForm.get('dateFilterEnabled')?.setValue(true, { emitEvent: false });
+    });
+
+    this.filterForm.get('startDate')?.valueChanges.subscribe(() => {
+      this.filterForm.get('dateFilterEnabled')?.setValue(true, { emitEvent: false });
+    });
+
+    this.filterForm.get('endDate')?.valueChanges.subscribe(() => {
+      this.filterForm.get('dateFilterEnabled')?.setValue(true, { emitEvent: false });
+    });
+
+    this.filterForm.get('amountFilterType')?.valueChanges.subscribe(() => {
+      this.filterForm.get('amountFilterEnabled')?.setValue(true, { emitEvent: false });
+    });
+
+    this.filterForm.get('minAmount')?.valueChanges.subscribe(() => {
+      if (this.filterForm.get('minAmount')?.value !== null) {
+        this.filterForm.get('amountFilterEnabled')?.setValue(true, { emitEvent: false });
+      }
+    });
+
+    this.filterForm.get('maxAmount')?.valueChanges.subscribe(() => {
+      if (this.filterForm.get('maxAmount')?.value !== null) {
+        this.filterForm.get('amountFilterEnabled')?.setValue(true, { emitEvent: false });
+      }
+    });
+
+    this.filterForm.get('noTags')?.valueChanges.subscribe(() => {
+      this.filterForm.get('tagFilterEnabled')?.setValue(true, { emitEvent: false });
+    });
   }
 
   private loadAvailableTags(): void {
@@ -136,15 +206,47 @@ export class FilterTransactionsDialogComponent implements OnInit {
     endDateControl?.updateValueAndValidity();
   }
 
+  private updateAmountValidators(amountFilterType: AmountFilterType): void {
+    const minAmountControl = this.filterForm.get('minAmount');
+    const maxAmountControl = this.filterForm.get('maxAmount');
+
+    // Clear validators
+    minAmountControl?.clearValidators();
+    maxAmountControl?.clearValidators();
+
+    // Set validators based on amount filter type (only min value, not required)
+    if (amountFilterType === 'less') {
+      maxAmountControl?.setValidators([Validators.min(0.01)]);
+      minAmountControl?.setValue(null);
+    } else if (amountFilterType === 'greater') {
+      minAmountControl?.setValidators([Validators.min(0.01)]);
+      maxAmountControl?.setValue(null);
+    } else if (amountFilterType === 'between') {
+      minAmountControl?.setValidators([Validators.min(0.01)]);
+      maxAmountControl?.setValidators([Validators.min(0.01)]);
+    }
+
+    minAmountControl?.updateValueAndValidity();
+    maxAmountControl?.updateValueAndValidity();
+  }
+
   onApply(): void {
     if (this.filterForm.valid) {
+      const types: TransactionType[] = [];
+      if (this.filterForm.value.depositSelected) types.push('DEPOSIT');
+      if (this.filterForm.value.withdrawalSelected) types.push('WITHDRAWAL');
+
       const result: TransactionFilter = {
         filterType: this.filterForm.value.filterType,
-        startDate: this.filterForm.value.startDate,
-        endDate: this.filterForm.value.endDate,
-        tags: this.selectedTags.length > 0 ? this.selectedTags : undefined,
-        noTags: this.filterForm.value.noTags,
-        tagFilterMode: this.filterForm.value.tagFilterMode
+        startDate: this.filterForm.value.dateFilterEnabled ? this.filterForm.value.startDate : undefined,
+        endDate: this.filterForm.value.dateFilterEnabled ? this.filterForm.value.endDate : undefined,
+        tags: this.filterForm.value.tagFilterEnabled && this.selectedTags.length > 0 ? this.selectedTags : undefined,
+        noTags: this.filterForm.value.tagFilterEnabled ? this.filterForm.value.noTags : undefined,
+        tagFilterMode: this.filterForm.value.tagFilterEnabled ? this.filterForm.value.tagFilterMode : undefined,
+        types: this.filterForm.value.typeFilterEnabled && types.length > 0 ? types : undefined,
+        amountFilterType: this.filterForm.value.amountFilterEnabled ? this.filterForm.value.amountFilterType : undefined,
+        minAmount: this.filterForm.value.amountFilterEnabled ? this.filterForm.value.minAmount : undefined,
+        maxAmount: this.filterForm.value.amountFilterEnabled ? this.filterForm.value.maxAmount : undefined
       };
       this.dialogRef.close(result);
     }
@@ -157,10 +259,33 @@ export class FilterTransactionsDialogComponent implements OnInit {
     } else {
       this.selectedTags.push(tag);
     }
+    
+    // Auto-enable tag filter when tags are selected
+    if (this.selectedTags.length > 0) {
+      this.filterForm.get('tagFilterEnabled')?.setValue(true, { emitEvent: false });
+    }
   }
 
   isTagSelected(tag: string): boolean {
     return this.selectedTags.includes(tag);
+  }
+
+  get showMinAmount(): boolean {
+    return this.filterForm.get('amountFilterType')?.value === 'greater' || 
+           this.filterForm.get('amountFilterType')?.value === 'between';
+  }
+
+  get showMaxAmount(): boolean {
+    return this.filterForm.get('amountFilterType')?.value === 'less' || 
+           this.filterForm.get('amountFilterType')?.value === 'between';
+  }
+
+  get minAmountLabel(): string {
+    return this.filterForm.get('amountFilterType')?.value === 'between' ? 'Minimum Amount' : 'Amount';
+  }
+
+  get maxAmountLabel(): string {
+    return this.filterForm.get('amountFilterType')?.value === 'between' ? 'Maximum Amount' : 'Amount';
   }
 
   onCancel(): void {
@@ -186,5 +311,12 @@ export class FilterTransactionsDialogComponent implements OnInit {
   get endDateLabel(): string {
     const filterType = this.filterForm.get('filterType')?.value;
     return filterType === 'between' ? 'End Date' : 'Before Date';
+  }
+
+  get isAnyFilterEnabled(): boolean {
+    return this.filterForm.get('dateFilterEnabled')?.value ||
+           this.filterForm.get('typeFilterEnabled')?.value ||
+           this.filterForm.get('amountFilterEnabled')?.value ||
+           this.filterForm.get('tagFilterEnabled')?.value;
   }
 }

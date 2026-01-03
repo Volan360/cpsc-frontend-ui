@@ -13,6 +13,34 @@ mat-dialog-content {
   overflow: visible;
 }
 
+mat-accordion {
+  display: block;
+}
+
+mat-expansion-panel {
+  margin-bottom: 8px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+}
+
+mat-panel-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+}
+
+.filter-checkbox {
+  margin-right: 4px;
+}
+
 .section-title {
   margin-top: 24px;
   margin-bottom: 12px;
@@ -66,4 +94,14 @@ mat-dialog-content {
   color: rgba(0, 0, 0, 0.6);
   font-style: italic;
   margin: 8px 0;
+}
+
+.type-checkboxes {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 16px;
+}
+
+.type-checkbox {
+  flex: 1;
 }

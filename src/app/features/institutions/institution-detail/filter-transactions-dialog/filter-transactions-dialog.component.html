@@ -2,77 +2,175 @@
 
 <mat-dialog-content>
   <form [formGroup]="filterForm">
-    <!-- Date Filtering Section -->
-    <h3 class="section-title">Filter by Date</h3>
-    
-    <mat-form-field appearance="outline" class="full-width">
-      <mat-label>Filter Type</mat-label>
-      <mat-select formControlName="filterType" required>
-        <mat-option value="before">Before a date</mat-option>
-        <mat-option value="after">After a date</mat-option>
-        <mat-option value="between">Between dates</mat-option>
-        <mat-option value="on">On a specific date</mat-option>
-      </mat-select>
-    </mat-form-field>
+    <mat-accordion>
+      <!-- Type Filtering Section -->
+      <mat-expansion-panel [expanded]="true">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-checkbox 
+              formControlName="typeFilterEnabled" 
+              (click)="$event.stopPropagation()"
+              class="filter-checkbox">
+            </mat-checkbox>
+            <mat-icon>swap_vert</mat-icon>
+            Filter by Type
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-    <mat-form-field appearance="outline" class="full-width" *ngIf="showStartDate">
-      <mat-label>{{ startDateLabel }}</mat-label>
-      <input matInput [matDatepicker]="startPicker" formControlName="startDate" [max]="maxDate" placeholder="Select date">
-      <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
-      <mat-datepicker #startPicker></mat-datepicker>
-      <mat-error *ngIf="filterForm.get('startDate')?.hasError('required')">
-        Date is required
-      </mat-error>
-    </mat-form-field>
+        <div class="type-checkboxes">
+          <mat-checkbox formControlName="depositSelected" class="type-checkbox">
+            Deposits
+          </mat-checkbox>
+          <mat-checkbox formControlName="withdrawalSelected" class="type-checkbox">
+            Withdrawals
+          </mat-checkbox>
+        </div>
+      </mat-expansion-panel>
 
-    <mat-form-field appearance="outline" class="full-width" *ngIf="showEndDate">
-      <mat-label>{{ endDateLabel }}</mat-label>
-      <input matInput [matDatepicker]="endPicker" formControlName="endDate" [max]="maxDate" placeholder="Select date">
-      <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
-      <mat-datepicker #endPicker></mat-datepicker>
-      <mat-error *ngIf="filterForm.get('endDate')?.hasError('required')">
-        Date is required
-      </mat-error>
-    </mat-form-field>
+      <!-- Date Filtering Section -->
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-checkbox 
+              formControlName="dateFilterEnabled" 
+              (click)="$event.stopPropagation()"
+              class="filter-checkbox">
+            </mat-checkbox>
+            <mat-icon>calendar_today</mat-icon>
+            Filter by Date
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-    <!-- Tag Filtering Section -->
-    <h3 class="section-title">Filter by Tags</h3>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Filter Type</mat-label>
+          <mat-select formControlName="filterType" required>
+            <mat-option value="before">Before a date</mat-option>
+            <mat-option value="after">After a date</mat-option>
+            <mat-option value="between">Between dates</mat-option>
+            <mat-option value="on">On a specific date</mat-option>
+          </mat-select>
+        </mat-form-field>
 
-    <mat-checkbox formControlName="noTags" class="no-tags-checkbox">
-      Show only transactions with no tags
-    </mat-checkbox>
+        <mat-form-field appearance="outline" class="full-width" *ngIf="showStartDate">
+          <mat-label>{{ startDateLabel }}</mat-label>
+          <input matInput [matDatepicker]="startPicker" formControlName="startDate" [max]="maxDate" placeholder="Select date">
+          <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+          <mat-datepicker #startPicker></mat-datepicker>
+          <mat-error *ngIf="filterForm.get('startDate')?.hasError('required')">
+            Date is required
+          </mat-error>
+        </mat-form-field>
 
-    <div class="tag-selection" *ngIf="!filterForm.get('noTags')?.value">
-      <div class="tag-chips" *ngIf="allTags.length > 0">
-        <mat-chip-set aria-label="Tag selection">
-          <mat-chip 
-            *ngFor="let tag of allTags"
-            [class.selected]="isTagSelected(tag)"
-            (click)="toggleTag(tag)">
-            {{ tag }}
-            <mat-icon *ngIf="isTagSelected(tag)" matChipTrailingIcon>check</mat-icon>
-          </mat-chip>
-        </mat-chip-set>
-      </div>
+        <mat-form-field appearance="outline" class="full-width" *ngIf="showEndDate">
+          <mat-label>{{ endDateLabel }}</mat-label>
+          <input matInput [matDatepicker]="endPicker" formControlName="endDate" [max]="maxDate" placeholder="Select date">
+          <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+          <mat-datepicker #endPicker></mat-datepicker>
+          <mat-error *ngIf="filterForm.get('endDate')?.hasError('required')">
+            Date is required
+          </mat-error>
+        </mat-form-field>
+      </mat-expansion-panel>
 
-      <p *ngIf="allTags.length === 0" class="no-tags-message">
-        No tags available
-      </p>
+      <!-- Amount Filtering Section -->
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-checkbox 
+              formControlName="amountFilterEnabled" 
+              (click)="$event.stopPropagation()"
+              class="filter-checkbox">
+            </mat-checkbox>
+            <mat-icon>attach_money</mat-icon>
+            Filter by Amount
+          </mat-panel-title>
+        </mat-expansion-panel-header>
 
-      <mat-form-field appearance="outline" class="full-width" *ngIf="selectedTags.length > 0">
-        <mat-label>Tag Filter Mode</mat-label>
-        <mat-select formControlName="tagFilterMode">
-          <mat-option value="any">Match ANY of the selected tags</mat-option>
-          <mat-option value="all">Match ALL of the selected tags</mat-option>
-        </mat-select>
-      </mat-form-field>
-    </div>
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Amount Filter Type</mat-label>
+          <mat-select formControlName="amountFilterType">
+            <mat-option value="less">Less than</mat-option>
+            <mat-option value="greater">Greater than</mat-option>
+            <mat-option value="between">Between</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" *ngIf="showMinAmount">
+          <mat-label>{{ minAmountLabel }}</mat-label>
+          <input matInput type="number" formControlName="minAmount" step="0.01" min="0.01" placeholder="Enter amount">
+          <span matPrefix>$&nbsp;</span>
+          <mat-error *ngIf="filterForm.get('minAmount')?.hasError('required')">
+            Amount is required
+          </mat-error>
+          <mat-error *ngIf="filterForm.get('minAmount')?.hasError('min')">
+            Amount must be at least $0.01
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" *ngIf="showMaxAmount">
+          <mat-label>{{ maxAmountLabel }}</mat-label>
+          <input matInput type="number" formControlName="maxAmount" step="0.01" min="0.01" placeholder="Enter amount">
+          <span matPrefix>$&nbsp;</span>
+          <mat-error *ngIf="filterForm.get('maxAmount')?.hasError('required')">
+            Amount is required
+          </mat-error>
+          <mat-error *ngIf="filterForm.get('maxAmount')?.hasError('min')">
+            Amount must be at least $0.01
+          </mat-error>
+        </mat-form-field>
+      </mat-expansion-panel>
+
+      <!-- Tag Filtering Section -->
+      <mat-expansion-panel [expanded]="false">
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            <mat-checkbox 
+              formControlName="tagFilterEnabled" 
+              (click)="$event.stopPropagation()"
+              class="filter-checkbox">
+            </mat-checkbox>
+            <mat-icon>label</mat-icon>
+            Filter by Tags
+          </mat-panel-title>
+        </mat-expansion-panel-header>
+
+        <mat-checkbox formControlName="noTags" class="no-tags-checkbox">
+          Show only transactions with no tags
+        </mat-checkbox>
+
+        <div class="tag-selection" *ngIf="!filterForm.get('noTags')?.value">
+          <div class="tag-chips" *ngIf="allTags.length > 0">
+            <mat-chip-set aria-label="Tag selection">
+              <mat-chip 
+                *ngFor="let tag of allTags"
+                [class.selected]="isTagSelected(tag)"
+                (click)="toggleTag(tag)">
+                {{ tag }}
+                <mat-icon *ngIf="isTagSelected(tag)" matChipTrailingIcon>check</mat-icon>
+              </mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <p *ngIf="allTags.length === 0" class="no-tags-message">
+            No tags available
+          </p>
+
+          <mat-form-field appearance="outline" class="full-width" *ngIf="selectedTags.length > 0">
+            <mat-label>Tag Filter Mode</mat-label>
+            <mat-select formControlName="tagFilterMode">
+              <mat-option value="any">Match ANY of the selected tags</mat-option>
+              <mat-option value="all">Match ALL of the selected tags</mat-option>
+            </mat-select>
+          </mat-form-field>
+        </div>
+      </mat-expansion-panel>
+    </mat-accordion>
   </form>
 </mat-dialog-content>
 
 <mat-dialog-actions align="end">
   <button mat-button (click)="onCancel()">Cancel</button>
-  <button mat-raised-button color="primary" (click)="onApply()" [disabled]="!filterForm.valid">
+  <button mat-raised-button color="primary" (click)="onApply()" [disabled]="!filterForm.valid || !isAnyFilterEnabled">
     Apply Filter
   </button>
 </mat-dialog-actions>

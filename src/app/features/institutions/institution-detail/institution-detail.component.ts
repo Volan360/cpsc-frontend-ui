@@ -236,7 +236,36 @@ export class InstitutionDetailComponent implements OnInit {
         }
       }
 
-      return passesTagFilter;
+      if (!passesTagFilter) {
+        return false;
+      }
+
+      // Type filtering
+      let passesTypeFilter = true;
+
+      if (this.activeFilter!.types && this.activeFilter!.types.length > 0) {
+        passesTypeFilter = this.activeFilter!.types.includes(transaction.type as any);
+      }
+
+      if (!passesTypeFilter) {
+        return false;
+      }
+
+      // Amount filtering
+      let passesAmountFilter = true;
+
+      if (this.activeFilter!.amountFilterType === 'less' && this.activeFilter!.maxAmount !== null && this.activeFilter!.maxAmount !== undefined) {
+        passesAmountFilter = transaction.amount < this.activeFilter!.maxAmount;
+      } else if (this.activeFilter!.amountFilterType === 'greater' && this.activeFilter!.minAmount !== null && this.activeFilter!.minAmount !== undefined) {
+        passesAmountFilter = transaction.amount > this.activeFilter!.minAmount;
+      } else if (this.activeFilter!.amountFilterType === 'between' && 
+                 this.activeFilter!.minAmount !== null && this.activeFilter!.minAmount !== undefined &&
+                 this.activeFilter!.maxAmount !== null && this.activeFilter!.maxAmount !== undefined) {
+        passesAmountFilter = transaction.amount >= this.activeFilter!.minAmount && 
+                             transaction.amount <= this.activeFilter!.maxAmount;
+      }
+
+      return passesAmountFilter;
     });
   }
 }
