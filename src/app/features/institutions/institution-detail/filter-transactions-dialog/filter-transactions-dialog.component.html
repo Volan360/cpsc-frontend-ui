@@ -1,7 +1,10 @@
-<h2 mat-dialog-title>Filter Transactions by Date</h2>
+<h2 mat-dialog-title>Filter Transactions</h2>
 
 <mat-dialog-content>
   <form [formGroup]="filterForm">
+    <!-- Date Filtering Section -->
+    <h3 class="section-title">Filter by Date</h3>
+    
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>Filter Type</mat-label>
       <mat-select formControlName="filterType" required>
@@ -31,6 +34,39 @@
         Date is required
       </mat-error>
     </mat-form-field>
+
+    <!-- Tag Filtering Section -->
+    <h3 class="section-title">Filter by Tags</h3>
+
+    <mat-checkbox formControlName="noTags" class="no-tags-checkbox">
+      Show only transactions with no tags
+    </mat-checkbox>
+
+    <div class="tag-selection" *ngIf="!filterForm.get('noTags')?.value">
+      <div class="tag-chips" *ngIf="allTags.length > 0">
+        <mat-chip-set aria-label="Tag selection">
+          <mat-chip 
+            *ngFor="let tag of allTags"
+            [class.selected]="isTagSelected(tag)"
+            (click)="toggleTag(tag)">
+            {{ tag }}
+            <mat-icon *ngIf="isTagSelected(tag)" matChipTrailingIcon>check</mat-icon>
+          </mat-chip>
+        </mat-chip-set>
+      </div>
+
+      <p *ngIf="allTags.length === 0" class="no-tags-message">
+        No tags available
+      </p>
+
+      <mat-form-field appearance="outline" class="full-width" *ngIf="selectedTags.length > 0">
+        <mat-label>Tag Filter Mode</mat-label>
+        <mat-select formControlName="tagFilterMode">
+          <mat-option value="any">Match ANY of the selected tags</mat-option>
+          <mat-option value="all">Match ALL of the selected tags</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
   </form>
 </mat-dialog-content>
 

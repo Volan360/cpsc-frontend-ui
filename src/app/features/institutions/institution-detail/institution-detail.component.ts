@@ -159,7 +159,11 @@ export class InstitutionDetailComponent implements OnInit {
 
   openFilterDialog(): void {
     const dialogRef = this.dialog.open(FilterTransactionsDialogComponent, {
-      width: DIALOG_WIDTHS.MEDIUM
+      width: DIALOG_WIDTHS.MEDIUM,
+      data: { 
+        institutionId: this.institutionId,
+        existingFilter: this.activeFilter
+      }
     });
 
     dialogRef.afterClosed().subscribe((filter: TransactionFilter | undefined) => {
@@ -182,37 +186,57 @@ export class InstitutionDetailComponent implements OnInit {
     }
 
     this.filteredTransactions = this.transactions.filter(transaction => {
+      // Date filtering
       const transactionDate = new Date(transaction.transactionDate * 1000);
       // Set to start of day for comparison
       transactionDate.setHours(0, 0, 0, 0);
 
+      let passesDateFilter = true;
+
       if (this.activeFilter!.filterType === 'before' && this.activeFilter!.endDate) {
         const endDate = new Date(this.activeFilter!.endDate);
         endDate.setHours(0, 0, 0, 0);
-        return transactionDate < endDate;
-      }
-
-      if (this.activeFilter!.filterType === 'after' && this.activeFilter!.startDate) {
+        passesDateFilter = transactionDate < endDate;
+      } else if (this.activeFilter!.filterType === 'after' && this.activeFilter!.startDate) {
         const startDate = new Date(this.activeFilter!.startDate);
         startDate.setHours(23, 59, 59, 999);
-        return transactionDate > startDate;
-      }
-
-      if (this.activeFilter!.filterType === 'between' && this.activeFilter!.startDate && this.activeFilter!.endDate) {
+        passesDateFilter = transactionDate > startDate;
+      } else if (this.activeFilter!.filterType === 'between' && this.activeFilter!.startDate && this.activeFilter!.endDate) {
         const startDate = new Date(this.activeFilter!.startDate);
         startDate.setHours(0, 0, 0, 0);
         const endDate = new Date(this.activeFilter!.endDate);
         endDate.setHours(23, 59, 59, 999);
-        return transactionDate >= startDate && transactionDate <= endDate;
-      }
-
-      if (this.activeFilter!.filterType === 'on' && this.activeFilter!.startDate) {
+        passesDateFilter = transactionDate >= startDate && transactionDate <= endDate;
+      } else if (this.activeFilter!.filterType === 'on' && this.activeFilter!.startDate) {
         const filterDate = new Date(this.activeFilter!.startDate);
         filterDate.setHours(0, 0, 0, 0);
-        return transactionDate.getTime() === filterDate.getTime();
+        passesDateFilter = transactionDate.getTime() === filterDate.getTime();
       }
 
-      return true;
+      if (!passesDateFilter) {
+        return false;
+      }
+
+      // Tag filtering
+      let passesTagFilter = true;
+
+      if (this.activeFilter!.noTags) {
+        // Show only transactions with no tags
+        passesTagFilter = !transaction.tags || transaction.tags.length === 0;
+      } else if (this.activeFilter!.tags && this.activeFilter!.tags.length > 0) {
+        // Filter by selected tags
+        const transactionTags = transaction.tags || [];
+        
+        if (this.activeFilter!.tagFilterMode === 'all') {
+          // Transaction must have ALL selected tags
+          passesTagFilter = this.activeFilter!.tags.every(tag => transactionTags.includes(tag));
+        } else {
+          // Transaction must have ANY of the selected tags (default)
+          passesTagFilter = this.activeFilter!.tags.some(tag => transactionTags.includes(tag));
+        }
+      }
+
+      return passesTagFilter;
     });
   }
 }
