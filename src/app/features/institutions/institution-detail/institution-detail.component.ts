@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
@@ -10,6 +10,8 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
+import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { InstitutionService } from '@core/services/institution.service';
 import { TransactionService } from '@core/services/transaction.service';
 import { InstitutionResponse } from '@core/models/institution.models';
@@ -33,19 +35,26 @@ import { DIALOG_WIDTHS } from '@core/constants/app.constants';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatExpansionModule,
+    MatPaginatorModule
   ],
   templateUrl: './institution-detail.component.html',
   styleUrls: ['./institution-detail.component.scss']
 })
 export class InstitutionDetailComponent implements OnInit {
+  @ViewChild(MatPaginator) paginator!: MatPaginator;
+  
   institution?: InstitutionResponse;
   transactions: TransactionResponse[] = [];
   filteredTransactions: TransactionResponse[] = [];
+  paginatedTransactions: TransactionResponse[] = [];
   activeFilter?: TransactionFilter;
   displayedColumns: string[] = ['type', 'amount', 'description', 'tags', 'createdAt', 'actions'];
   loading = true;
   institutionId!: string;
+  pageSize = 10;
+  pageSizeOptions = [5, 10, 25, 50, 100];
 
   constructor(
     private route: ActivatedRoute,
@@ -134,6 +143,23 @@ export class InstitutionDetailComponent implements OnInit {
     this.router.navigate(['/institutions']);
   }
 
+  deleteInstitution(): void {
+    if (!this.institution) return;
+    
+    if (confirm(`Are you sure you want to delete ${this.institution.institutionName}? This will also delete all associated transactions.`)) {
+      this.institutionService.deleteInstitution(this.institution.institutionId).subscribe({
+        next: () => {
+          this.notificationService.success('Institution deleted successfully');
+          this.router.navigate(['/institutions']);
+        },
+        error: (error) => {
+          console.error('Error deleting institution:', error);
+          this.notificationService.error('Failed to delete institution');
+        }
+      });
+    }
+  }
+
   getCurrentBalance(): number {
     if (!this.institution) return 0;
     
@@ -179,9 +205,23 @@ export class InstitutionDetailComponent implements OnInit {
     this.applyFilter();
   }
 
+  updatePagination(): void {
+    if (this.paginator) {
+      this.paginator.firstPage();
+    }
+    this.onPageChange();
+  }
+
+  onPageChange(): void {
+    const startIndex = this.paginator ? this.paginator.pageIndex * this.paginator.pageSize : 0;
+    const endIndex = startIndex + (this.paginator ? this.paginator.pageSize : this.pageSize);
+    this.paginatedTransactions = this.filteredTransactions.slice(startIndex, endIndex);
+  }
+
   private applyFilter(): void {
     if (!this.activeFilter) {
       this.filteredTransactions = [...this.transactions];
+      this.updatePagination();
       return;
     }
 
@@ -267,5 +307,7 @@ export class InstitutionDetailComponent implements OnInit {
 
       return passesAmountFilter;
     });
+
+    this.updatePagination();
   }
 }

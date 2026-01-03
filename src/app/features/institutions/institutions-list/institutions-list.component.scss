@@ -41,10 +41,34 @@ table {
 
   .clickable-row {
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 
     &:hover {
-      background-color: rgba(0, 0, 0, 0.04);
+      background-color: rgba(0, 0, 0, 0.08);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transform: translateX(2px);
+      border-left-color: var(--primary-color);
+
+      .row-chevron {
+        color: var(--primary-color);
+        transform: translateX(4px);
+      }
+    }
+
+    &:active {
+      transform: translateX(0);
+      background-color: rgba(0, 0, 0, 0.12);
+    }
+  }
+
+  .chevron-cell {
+    width: 40px;
+    text-align: center;
+
+    .row-chevron {
+      transition: all 0.2s ease;
+      color: rgba(0, 0, 0, 0.4);
     }
   }
 
@@ -59,4 +83,79 @@ table {
 
 mat-card {
   margin: 20px;
+}
+
+// Mobile responsive styles
+.mobile-list {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none;
+  }
+
+  .mobile-list {
+    display: block;
+    margin-top: 20px;
+  }
+
+  .mobile-institution-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px;
+    background: white;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 4px;
+    margin-bottom: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      background-color: rgba(0, 0, 0, 0.04);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    &:active {
+      transform: scale(0.98);
+    }
+
+    .mobile-institution-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .mobile-name {
+        font-weight: 500;
+        font-size: 16px;
+        color: rgba(0, 0, 0, 0.87);
+      }
+
+      .mobile-balance {
+        font-weight: 600;
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    .mobile-chevron {
+      color: rgba(0, 0, 0, 0.4);
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  mat-card {
+    margin: 10px;
+  }
+
+  .actions-bar {
+    button {
+      width: 100%;
+      justify-content: center;
+    }
+  }
 }

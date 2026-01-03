@@ -1,5 +1,11 @@
 .header-actions {
   margin: 20px;
+  display: flex;
+  align-items: center;
+
+  .spacer {
+    flex: 1 1 auto;
+  }
 }
 
 mat-card {
@@ -58,6 +64,10 @@ mat-card {
     }
   }
 
+  .transactions-paginator {
+    margin-top: 20px;
+  }
+
   .loading-container {
     display: flex;
     justify-content: center;
@@ -83,9 +93,11 @@ mat-card {
     }
   }
 
-  table {
+  // Desktop table view
+  .desktop-table {
     width: 100%;
     margin-top: 20px;
+    display: table;
 
     th {
       font-weight: 600;
@@ -121,6 +133,124 @@ mat-card {
         width: 16px;
         height: 16px;
         margin-right: 4px;
+      }
+    }
+  }
+
+  // Mobile collapsible list view
+  .mobile-list {
+    display: none;
+    margin-top: 20px;
+
+    mat-accordion {
+      mat-expansion-panel {
+        margin-bottom: 8px;
+      }
+    }
+
+    .mobile-transaction-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+      padding-right: 16px;
+
+      .mobile-amount {
+        font-size: 18px;
+        font-weight: 600;
+
+        &.deposit {
+          color: var(--success-color, #4caf50);
+        }
+
+        &.withdrawal {
+          color: var(--warn-color, #f44336);
+        }
+      }
+
+      .mobile-date {
+        font-size: 14px;
+        color: rgba(0, 0, 0, 0.6);
+      }
+    }
+
+    .mobile-transaction-details {
+      padding: 16px 0;
+
+      .detail-row {
+        display: flex;
+        align-items: center;
+        margin-bottom: 12px;
+        gap: 12px;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+
+        .detail-label {
+          font-weight: 500;
+          min-width: 100px;
+          color: rgba(0, 0, 0, 0.7);
+        }
+
+        .detail-value {
+          flex: 1;
+        }
+
+        &.mobile-actions {
+          justify-content: flex-end;
+          margin-top: 16px;
+          padding-top: 16px;
+          border-top: 1px solid rgba(0, 0, 0, 0.1);
+        }
+      }
+
+      .mobile-chip {
+        mat-icon {
+          font-size: 16px;
+          width: 16px;
+          height: 16px;
+          margin-right: 4px;
+        }
+
+        &.deposit {
+          background-color: rgba(76, 175, 80, 0.1);
+          color: var(--success-color, #4caf50);
+        }
+
+        &.withdrawal {
+          background-color: rgba(244, 67, 54, 0.1);
+          color: var(--warn-color, #f44336);
+        }
+      }
+    }
+  }
+
+  // Media query for mobile devices
+  @media (max-width: 768px) {
+    .desktop-table {
+      display: none;
+    }
+
+    .mobile-list {
+      display: block;
+    }
+
+    .actions-bar {
+      flex-direction: column;
+      gap: 12px;
+
+      button {
+        width: 100%;
+      }
+
+      .filter-actions {
+        width: 100%;
+        flex-direction: column;
+
+        button {
+          width: 100%;
+        }
       }
     }
   }

@@ -1,16 +1,22 @@
 <div class="app-container" *ngIf="isAuthenticated()">
   <mat-toolbar color="primary" class="global-toolbar">
+    <button mat-icon-button class="hamburger-menu" (click)="drawer.toggle()">
+      <mat-icon>menu</mat-icon>
+    </button>
+    
     <span class="toolbar-title">CPSC Cornerstone</span>
     
-    <button mat-button (click)="navigateTo('/dashboard')">
-      <mat-icon>dashboard</mat-icon>
-      <span class="nav-label">Dashboard</span>
-    </button>
-    
-    <button mat-button (click)="navigateTo('/institutions')">
-      <mat-icon>account_balance</mat-icon>
-      <span class="nav-label">Institutions</span>
-    </button>
+    <div class="desktop-nav">
+      <button mat-button (click)="navigateTo('/dashboard')">
+        <mat-icon>dashboard</mat-icon>
+        <span class="nav-label">Dashboard</span>
+      </button>
+      
+      <button mat-button (click)="navigateTo('/institutions')">
+        <mat-icon>account_balance</mat-icon>
+        <span class="nav-label">Institutions</span>
+      </button>
+    </div>
     
     <span class="spacer"></span>
     
@@ -33,9 +39,27 @@
     </mat-menu>
   </mat-toolbar>
 
-  <div class="app-content">
-    <router-outlet></router-outlet>
-  </div>
+  <mat-drawer-container class="drawer-container">
+    <mat-drawer #drawer mode="over" class="mobile-drawer">
+      <div class="drawer-content">
+        <button mat-button class="drawer-nav-item" (click)="navigateTo('/dashboard'); drawer.close()">
+          <mat-icon>dashboard</mat-icon>
+          <span>Dashboard</span>
+        </button>
+        
+        <button mat-button class="drawer-nav-item" (click)="navigateTo('/institutions'); drawer.close()">
+          <mat-icon>account_balance</mat-icon>
+          <span>Institutions</span>
+        </button>
+      </div>
+    </mat-drawer>
+
+    <mat-drawer-content>
+      <div class="app-content">
+        <router-outlet></router-outlet>
+      </div>
+    </mat-drawer-content>
+  </mat-drawer-container>
 </div>
 
 <router-outlet *ngIf="!isAuthenticated()"></router-outlet>

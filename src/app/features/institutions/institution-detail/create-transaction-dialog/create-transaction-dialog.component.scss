@@ -22,3 +22,25 @@ mat-dialog-content {
 mat-dialog-actions {
   padding: 16px 24px;
 }
+
+// Mobile responsive styles
+@media (max-width: 768px) {
+  :host ::ng-deep .mat-mdc-dialog-container {
+    max-width: 95vw !important;
+    width: 95vw !important;
+  }
+
+  mat-dialog-content {
+    min-width: unset;
+    width: 100%;
+    padding: 16px;
+  }
+
+  mat-dialog-actions {
+    padding: 12px 16px;
+    
+    button {
+      flex: 1;
+    }
+  }
+}

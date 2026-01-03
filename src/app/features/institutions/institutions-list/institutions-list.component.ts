@@ -9,6 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatExpansionModule } from '@angular/material/expansion';
 import { InstitutionService } from '@core/services/institution.service';
 import { InstitutionResponse } from '@core/models/institution.models';
 import { CreateInstitutionDialogComponent } from './create-institution-dialog/create-institution-dialog.component';
@@ -27,16 +28,19 @@ import { formatDate, formatCurrency } from '@core/utils/date.utils';
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatDialogModule,
-    MatTooltipModule
+    MatTooltipModule,
+    MatExpansionModule
   ],
   templateUrl: './institutions-list.component.html',
   styleUrls: ['./institutions-list.component.scss']
 })
 export class InstitutionsListComponent implements OnInit {
   institutions: InstitutionResponse[] = [];
-  displayedColumns: string[] = ['institutionName', 'currentBalance', 'createdAt', 'actions'];
+  displayedColumns: string[] = ['institutionName', 'currentBalance', 'createdAt', 'actions', 'chevron'];
   loading = true;
   nextToken?: string;
+  private longPressTimer: any;
+  private isLongPress = false;
 
   constructor(
     private institutionService: InstitutionService,
@@ -100,23 +104,34 @@ export class InstitutionsListComponent implements OnInit {
     this.router.navigate(['/institutions', institution.institutionId]);
   }
 
-  deleteInstitution(institution: InstitutionResponse, event: Event): void {
-    event.stopPropagation();
-    
-    if (confirm(`Are you sure you want to delete ${institution.institutionName}?`)) {
-      this.institutionService.deleteInstitution(institution.institutionId).subscribe({
-        next: () => {
-          this.notificationService.success('Institution deleted successfully');
-          this.loadInstitutions();
-        },
-        error: (error) => {
-          console.error('Error deleting institution:', error);
-          this.notificationService.error('Failed to delete institution');
-        }
-      });
-    }
-  }
-
   formatDate = formatDate;
   formatCurrency = formatCurrency;
+
+  onMobileTouchStart(institution: InstitutionResponse, event: TouchEvent): void {
+    this.isLongPress = false;
+    this.longPressTimer = setTimeout(() => {
+      this.isLongPress = true;
+      // Trigger haptic feedback if available
+      if ('vibrate' in navigator) {
+        navigator.vibrate(50);
+      }
+      this.editInstitution(institution, event);
+    }, 500); // 500ms for long press
+  }
+
+  onMobileTouchEnd(): void {
+    clearTimeout(this.longPressTimer);
+  }
+
+  onMobileTouchMove(): void {
+    clearTimeout(this.longPressTimer);
+  }
+
+  onMobileClick(institution: InstitutionResponse, event: Event): void {
+    // Only navigate if it wasn't a long press
+    if (!this.isLongPress) {
+      this.viewInstitution(institution);
+    }
+    this.isLongPress = false;
+  }
 }

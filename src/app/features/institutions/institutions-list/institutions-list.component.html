@@ -20,7 +20,8 @@
       <p>No institutions found. Create your first one!</p>
     </div>
 
-    <table mat-table [dataSource]="institutions" *ngIf="!loading && institutions.length > 0">
+    <!-- Desktop Table View -->
+    <table mat-table [dataSource]="institutions" *ngIf="!loading && institutions.length > 0" class="desktop-table">
       <!-- Institution Name Column -->
       <ng-container matColumnDef="institutionName">
         <th mat-header-cell *matHeaderCellDef>Institution Name</th>
@@ -43,20 +44,38 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let institution">
-          <button mat-icon-button (click)="viewInstitution(institution)" matTooltip="View Details">
-            <mat-icon>visibility</mat-icon>
-          </button>
           <button mat-icon-button (click)="editInstitution(institution, $event)" matTooltip="Edit">
             <mat-icon>edit</mat-icon>
           </button>
-          <button mat-icon-button color="warn" (click)="deleteInstitution(institution, $event)" matTooltip="Delete">
-            <mat-icon>delete</mat-icon>
-          </button>
+        </td>
+      </ng-container>
+
+      <!-- Chevron Column -->
+      <ng-container matColumnDef="chevron">
+        <th mat-header-cell *matHeaderCellDef></th>
+        <td mat-cell *matCellDef="let institution" class="chevron-cell">
+          <mat-icon class="row-chevron">chevron_right</mat-icon>
         </td>
       </ng-container>
 
       <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
       <tr mat-row *matRowDef="let row; columns: displayedColumns;" (click)="viewInstitution(row)" class="clickable-row"></tr>
     </table>
+
+    <!-- Mobile List View -->
+    <div class="mobile-list" *ngIf="!loading && institutions.length > 0">
+      <div class="mobile-institution-item" 
+           *ngFor="let institution of institutions" 
+           (touchstart)="onMobileTouchStart(institution, $event)"
+           (touchend)="onMobileTouchEnd()"
+           (touchmove)="onMobileTouchMove()"
+           (click)="onMobileClick(institution, $event)">
+        <div class="mobile-institution-info">
+          <div class="mobile-name">{{ institution.institutionName }}</div>
+          <div class="mobile-balance">{{ formatCurrency(institution.currentBalance) }}</div>
+        </div>
+        <mat-icon class="mobile-chevron">chevron_right</mat-icon>
+      </div>
+    </div>
   </mat-card-content>
 </mat-card>

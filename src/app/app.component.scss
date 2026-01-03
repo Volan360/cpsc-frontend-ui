@@ -49,3 +49,64 @@
     margin-top: 4px;
   }
 }
+
+.drawer-container {
+  flex: 1;
+  height: calc(100vh - 64px);
+}
+
+.mobile-drawer {
+  width: 250px;
+
+  .drawer-content {
+    padding: 16px 0;
+
+    .drawer-nav-item {
+      width: 100%;
+      justify-content: flex-start;
+      padding: 12px 24px;
+      font-size: 16px;
+
+      mat-icon {
+        margin-right: 16px;
+      }
+    }
+  }
+}
+
+.hamburger-menu {
+  display: none;
+}
+
+// Mobile responsive styles
+@media (max-width: 768px) {
+  .hamburger-menu {
+    display: inline-flex;
+    margin-right: 8px;
+  }
+
+  .desktop-nav {
+    display: none;
+  }
+
+  .global-toolbar {
+    .toolbar-title {
+      font-size: 18px;
+    }
+  }
+
+  .app-content {
+    padding: 12px;
+  }
+
+  .drawer-container {
+    height: calc(100vh - 56px);
+  }
+}
+
+@media (min-width: 769px) {
+  .desktop-nav {
+    display: flex;
+    gap: 8px;
+  }
+}
