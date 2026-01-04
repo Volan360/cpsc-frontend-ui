@@ -8,13 +8,14 @@ export interface LoginResponse {
   refreshToken: string;
   expiresIn: number;
   tokenType: string;
+  screenName?: string;
+  email?: string;
 }
 
 export interface SignUpRequest {
   email: string;
   password: string;
-  firstName?: string;
-  lastName?: string;
+  screenName: string;
 }
 
 export interface SignUpResponse {
@@ -40,10 +41,10 @@ export interface ResendCodeResponse {
 }
 
 export interface UserProfile {
+  message?: string;
   email: string;
-  firstName?: string;
-  lastName?: string;
-  emailVerified: boolean;
+  screenName?: string;
+  authenticated?: boolean;
 }
 
 export interface AuthState {

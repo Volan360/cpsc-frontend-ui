@@ -53,8 +53,7 @@ export class SignUpComponent implements OnInit {
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(8)]],
       confirmPassword: ['', [Validators.required]],
-      firstName: [''],
-      lastName: ['']
+      screenName: ['', [Validators.required, Validators.minLength(3), Validators.maxLength(50)]]
     }, { validators: this.passwordMatchValidator });
   }
 
@@ -77,8 +76,7 @@ export class SignUpComponent implements OnInit {
       const request: SignUpRequest = {
         email: this.signUpForm.value.email,
         password: this.signUpForm.value.password,
-        firstName: this.signUpForm.value.firstName,
-        lastName: this.signUpForm.value.lastName
+        screenName: this.signUpForm.value.screenName
       };
 
       this.authService.signUp(request).subscribe({
@@ -146,22 +144,37 @@ export class SignUpComponent implements OnInit {
 
   getErrorMessage(fieldName: string): string {
     const control = this.signUpForm.get(fieldName);
+    const displayName = this.getDisplayName(fieldName);
     
     if (control?.hasError('required')) {
-      return `${this.capitalize(fieldName)} is required`;
+      return `${displayName} is required`;
     }
     if (control?.hasError('email')) {
       return 'Please enter a valid email address';
     }
     if (control?.hasError('minlength')) {
       const minLength = control.errors?.['minlength'].requiredLength;
-      return `${this.capitalize(fieldName)} must be at least ${minLength} characters`;
+      return `${displayName} must be at least ${minLength} characters`;
+    }
+    if (control?.hasError('maxlength')) {
+      const maxLength = control.errors?.['maxlength'].requiredLength;
+      return `${displayName} must be at most ${maxLength} characters`;
     }
     if (control?.hasError('passwordMismatch')) {
       return 'Passwords do not match';
     }
     
     return '';
+  }
+
+  private getDisplayName(fieldName: string): string {
+    const displayNames: { [key: string]: string } = {
+      email: 'Email',
+      password: 'Password',
+      confirmPassword: 'Confirm password',
+      screenName: 'Screen name'
+    };
+    return displayNames[fieldName] || this.capitalize(fieldName);
   }
 
   private capitalize(str: string): string {

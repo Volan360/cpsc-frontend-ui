@@ -4,6 +4,7 @@ import { Observable } from 'rxjs';
 import { environment } from '@environments/environment';
 import {
   CreateTransactionRequest,
+  UpdateTransactionRequest,
   TransactionResponse
 } from '@core/models/transaction.models';
 
@@ -43,6 +44,20 @@ export class TransactionService {
   deleteTransaction(institutionId: string, transactionId: string): Observable<void> {
     return this.http.delete<void>(
       `${this.apiUrl}/institutions/${institutionId}/transactions/${transactionId}`
+    );
+  }
+
+  /**
+   * Update an existing transaction
+   */
+  updateTransaction(
+    institutionId: string,
+    transactionId: string,
+    request: UpdateTransactionRequest
+  ): Observable<TransactionResponse> {
+    return this.http.put<TransactionResponse>(
+      `${this.apiUrl}/institutions/${institutionId}/transactions/${transactionId}`,
+      request
     );
   }
 }

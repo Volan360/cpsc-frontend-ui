@@ -43,6 +43,10 @@
         Add Transaction
       </button>
       <div class="filter-actions">
+        <button mat-stroked-button (click)="toggleSortDirection()" matTooltip="Toggle sort order">
+          <mat-icon>{{ sortDirection === 'newest' ? 'arrow_downward' : 'arrow_upward' }}</mat-icon>
+          {{ sortDirection === 'newest' ? 'Newest First' : 'Oldest First' }}
+        </button>
         <button mat-stroked-button (click)="openFilterDialog()">
           <mat-icon>filter_list</mat-icon>
           Filter
@@ -119,6 +123,9 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let transaction">
+          <button mat-icon-button (click)="editTransaction(transaction, $event)" matTooltip="Edit">
+            <mat-icon>edit</mat-icon>
+          </button>
           <button mat-icon-button color="warn" (click)="deleteTransaction(transaction, $event)" matTooltip="Delete">
             <mat-icon>delete</mat-icon>
           </button>
@@ -180,6 +187,10 @@
             </div>
 
             <div class="detail-row mobile-actions">
+              <button mat-raised-button (click)="editTransaction(transaction, $event)">
+                <mat-icon>edit</mat-icon>
+                Edit
+              </button>
               <button mat-raised-button color="warn" (click)="deleteTransaction(transaction, $event)">
                 <mat-icon>delete</mat-icon>
                 Delete

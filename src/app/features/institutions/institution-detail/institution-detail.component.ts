@@ -55,6 +55,7 @@ export class InstitutionDetailComponent implements OnInit {
   institutionId!: string;
   pageSize = 10;
   pageSizeOptions = [5, 10, 25, 50, 100];
+  sortDirection: 'newest' | 'oldest' = 'newest';
 
   constructor(
     private route: ActivatedRoute,
@@ -113,6 +114,21 @@ export class InstitutionDetailComponent implements OnInit {
     const dialogRef = this.dialog.open(CreateTransactionDialogComponent, {
       width: DIALOG_WIDTHS.MEDIUM,
       data: { institutionId: this.institutionId }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadTransactions();
+      }
+    });
+  }
+
+  editTransaction(transaction: TransactionResponse, event: Event): void {
+    event.stopPropagation();
+    
+    const dialogRef = this.dialog.open(CreateTransactionDialogComponent, {
+      width: DIALOG_WIDTHS.MEDIUM,
+      data: { institutionId: this.institutionId, transaction }
     });
 
     dialogRef.afterClosed().subscribe(result => {
@@ -218,9 +234,22 @@ export class InstitutionDetailComponent implements OnInit {
     this.paginatedTransactions = this.filteredTransactions.slice(startIndex, endIndex);
   }
 
+  toggleSortDirection(): void {
+    this.sortDirection = this.sortDirection === 'newest' ? 'oldest' : 'newest';
+    this.applyFilter();
+  }
+
+  private sortTransactions(transactions: TransactionResponse[]): TransactionResponse[] {
+    return [...transactions].sort((a, b) => {
+      const dateA = a.transactionDate || a.createdAt;
+      const dateB = b.transactionDate || b.createdAt;
+      return this.sortDirection === 'newest' ? dateB - dateA : dateA - dateB;
+    });
+  }
+
   private applyFilter(): void {
     if (!this.activeFilter) {
-      this.filteredTransactions = [...this.transactions];
+      this.filteredTransactions = this.sortTransactions(this.transactions);
       this.updatePagination();
       return;
     }
@@ -308,6 +337,7 @@ export class InstitutionDetailComponent implements OnInit {
       return passesAmountFilter;
     });
 
+    this.filteredTransactions = this.sortTransactions(this.filteredTransactions);
     this.updatePagination();
   }
 }

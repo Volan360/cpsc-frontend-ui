@@ -140,12 +140,19 @@ export class AuthService {
     this.storeRefreshToken(response.refreshToken);
     this.isAuthenticated.set(true);
     
-    // Fetch user profile after successful login
-    this.getUserProfile().subscribe();
+    // Create user profile from login response
+    // Note: screenName comes from the ID token during login, not from the access token
+    const user: UserProfile = {
+      email: response.email || '',
+      screenName: response.screenName,
+      authenticated: true
+    };
+    this.currentUser.set(user);
+    this.storeUser(user);
 
     this.authStateSubject.next({
       isAuthenticated: true,
-      user: this.currentUser(),
+      user: user,
       accessToken: response.accessToken,
       refreshToken: response.refreshToken
     });

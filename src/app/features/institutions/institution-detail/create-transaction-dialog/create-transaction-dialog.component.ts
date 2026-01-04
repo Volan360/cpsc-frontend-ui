@@ -14,7 +14,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { TransactionService } from '@core/services/transaction.service';
 import { InstitutionService } from '@core/services/institution.service';
-import { TransactionType } from '@core/models/transaction.models';
+import { TransactionType, TransactionResponse } from '@core/models/transaction.models';
 import { NotificationService } from '@core/services/notification.service';
 import { getDefaultDate, dateToUnixTimestamp, getMaxDate } from '@core/utils/date.utils';
 import { Observable, map, startWith } from 'rxjs';
@@ -49,6 +49,8 @@ export class CreateTransactionDialogComponent implements OnInit {
   tagControl = new FormControl('');
   allTags: string[] = [];
   filteredTags$: Observable<string[]>;
+  isEditMode = false;
+  transactionToEdit?: TransactionResponse;
   maxDate = getMaxDate(); // Prevent future dates
 
   @ViewChild(MatAutocompleteTrigger) autocompleteTrigger!: MatAutocompleteTrigger;
@@ -59,14 +61,22 @@ export class CreateTransactionDialogComponent implements OnInit {
     private institutionService: InstitutionService,
     private dialogRef: MatDialogRef<CreateTransactionDialogComponent>,
     private notificationService: NotificationService,
-    @Inject(MAT_DIALOG_DATA) public data: { institutionId: string }
+    @Inject(MAT_DIALOG_DATA) public data: { institutionId: string, transaction?: TransactionResponse }
   ) {
+    this.isEditMode = !!data.transaction;
+    this.transactionToEdit = data.transaction;
+
     this.transactionForm = this.fb.group({
-      type: [TransactionType.DEPOSIT, Validators.required],
-      amount: [0, [Validators.required, Validators.min(0.01)]],
-      description: ['', Validators.maxLength(500)],
-      transactionDate: [getDefaultDate()]  // Default to today's date
+      type: [this.transactionToEdit?.type || TransactionType.DEPOSIT, Validators.required],
+      amount: [this.transactionToEdit?.amount || 0, [Validators.required, Validators.min(0.01)]],
+      description: [this.transactionToEdit?.description || '', Validators.maxLength(500)],
+      transactionDate: [this.transactionToEdit ? new Date(this.transactionToEdit.transactionDate * 1000) : getDefaultDate()]
     });
+
+    // Initialize tags from transaction if editing
+    if (this.transactionToEdit?.tags) {
+      this.tags = [...this.transactionToEdit.tags];
+    }
 
     // Set up autocomplete filtering
     this.filteredTags$ = this.tagControl.valueChanges.pipe(
@@ -176,17 +186,35 @@ export class CreateTransactionDialogComponent implements OnInit {
         requestData.transactionDate = dateToUnixTimestamp(formValue.transactionDate);
       }
 
-      this.transactionService.createTransaction(this.data.institutionId, requestData).subscribe({
-        next: (response) => {
-          this.notificationService.success('Transaction created successfully');
-          this.dialogRef.close(response);
-        },
-        error: (error) => {
-          console.error('Error creating transaction:', error);
-          this.notificationService.error(error.error?.error || 'Failed to create transaction');
-          this.submitting = false;
-        }
-      });
+      if (this.isEditMode && this.transactionToEdit) {
+        this.transactionService.updateTransaction(
+          this.data.institutionId, 
+          this.transactionToEdit.transactionId, 
+          requestData
+        ).subscribe({
+          next: (response) => {
+            this.notificationService.success('Transaction updated successfully');
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Error updating transaction:', error);
+            this.notificationService.error(error.error?.error || 'Failed to update transaction');
+            this.submitting = false;
+          }
+        });
+      } else {
+        this.transactionService.createTransaction(this.data.institutionId, requestData).subscribe({
+          next: (response) => {
+            this.notificationService.success('Transaction created successfully');
+            this.dialogRef.close(response);
+          },
+          error: (error) => {
+            console.error('Error creating transaction:', error);
+            this.notificationService.error(error.error?.error || 'Failed to create transaction');
+            this.submitting = false;
+          }
+        });
+      }
     }
   }
 

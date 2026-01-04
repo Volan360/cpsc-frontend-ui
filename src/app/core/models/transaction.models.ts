@@ -11,6 +11,14 @@ export interface CreateTransactionRequest {
   transactionDate?: number;  // Optional UNIX timestamp
 }
 
+export interface UpdateTransactionRequest {
+  type?: TransactionType;
+  amount?: number;
+  tags?: string[];
+  description?: string;
+  transactionDate?: number;  // Optional UNIX timestamp
+}
+
 export interface TransactionResponse {
   transactionId: string;
   institutionId: string;
