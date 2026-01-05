@@ -16,6 +16,11 @@
         <mat-icon>account_balance</mat-icon>
         <span class="nav-label">Institutions</span>
       </button>
+      
+      <button mat-button (click)="navigateTo('/goals')">
+        <mat-icon>flag</mat-icon>
+        <span class="nav-label">Goals</span>
+      </button>
     </div>
     
     <span class="spacer"></span>
@@ -50,6 +55,11 @@
         <button mat-button class="drawer-nav-item" (click)="navigateTo('/institutions'); drawer.close()">
           <mat-icon>account_balance</mat-icon>
           <span>Institutions</span>
+        </button>
+        
+        <button mat-button class="drawer-nav-item" (click)="navigateTo('/goals'); drawer.close()">
+          <mat-icon>flag</mat-icon>
+          <span>Goals</span>
         </button>
       </div>
     </mat-drawer>

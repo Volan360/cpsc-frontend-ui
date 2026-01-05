@@ -14,13 +14,16 @@ import { MatExpansionModule } from '@angular/material/expansion';
 import { MatPaginator, MatPaginatorModule } from '@angular/material/paginator';
 import { InstitutionService } from '@core/services/institution.service';
 import { TransactionService } from '@core/services/transaction.service';
+import { GoalService } from '@core/services/goal.service';
 import { InstitutionResponse } from '@core/models/institution.models';
 import { TransactionResponse } from '@core/models/transaction.models';
+import { GoalResponse } from '@core/models/goal.models';
 import { CreateTransactionDialogComponent } from './create-transaction-dialog/create-transaction-dialog.component';
 import { FilterTransactionsDialogComponent, TransactionFilter } from './filter-transactions-dialog/filter-transactions-dialog.component';
 import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { DIALOG_WIDTHS } from '@core/constants/app.constants';
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-institution-detail',
@@ -49,6 +52,7 @@ export class InstitutionDetailComponent implements OnInit {
   transactions: TransactionResponse[] = [];
   filteredTransactions: TransactionResponse[] = [];
   paginatedTransactions: TransactionResponse[] = [];
+  linkedGoalsDetails: GoalResponse[] = [];
   activeFilter?: TransactionFilter;
   displayedColumns: string[] = ['type', 'amount', 'description', 'tags', 'createdAt', 'actions'];
   loading = true;
@@ -62,6 +66,7 @@ export class InstitutionDetailComponent implements OnInit {
     private router: Router,
     private institutionService: InstitutionService,
     private transactionService: TransactionService,
+    private goalService: GoalService,
     private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
@@ -74,15 +79,25 @@ export class InstitutionDetailComponent implements OnInit {
   loadInstitutionData(): void {
     this.loading = true;
     
-    // Load institution details and transactions
-    this.institutionService.getInstitutions().subscribe({
-      next: (response) => {
-        this.institution = response.institutions.find(i => i.institutionId === this.institutionId);
+    // Load institution details, transactions, and goals
+    forkJoin({
+      institutions: this.institutionService.getInstitutions(),
+      goals: this.goalService.getGoals()
+    }).subscribe({
+      next: ({ institutions, goals }) => {
+        this.institution = institutions.institutions.find(i => i.institutionId === this.institutionId);
         
         if (!this.institution) {
           this.notificationService.error('Institution not found');
           this.router.navigate(['/institutions']);
           return;
+        }
+
+        // Load linked goals
+        if (this.institution.linkedGoals && this.institution.linkedGoals.length > 0) {
+          this.linkedGoalsDetails = goals.goals.filter(g => 
+            this.institution!.linkedGoals!.includes(g.goalId)
+          );
         }
 
         this.loadTransactions();
@@ -190,6 +205,15 @@ export class InstitutionDetailComponent implements OnInit {
     });
     
     return balance;
+  }
+
+  getTotalAllocatedFunds(): number {
+    if (!this.institution || !this.institution.allocatedPercent) return 0;
+    return (this.getCurrentBalance() * this.institution.allocatedPercent) / 100;
+  }
+
+  navigateToGoal(goalId: string): void {
+    this.router.navigate(['/goals', goalId]);
   }
 
   getTransactionClass(type: string): string {

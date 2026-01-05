@@ -17,6 +17,11 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
+    path: 'goals',
+    loadChildren: () => import('./features/goals/goals.routes').then(m => m.GOALS_ROUTES),
+    canActivate: [authGuard]
+  },
+  {
     path: '',
     redirectTo: '/auth/sign-in',
     pathMatch: 'full'

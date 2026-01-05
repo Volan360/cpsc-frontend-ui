@@ -27,6 +27,24 @@
           {{ formatCurrency(getCurrentBalance()) }}
         </span>
       </div>
+      <div class="balance-item" *ngIf="institution.allocatedPercent">
+        <span class="label">Allocated to Goals:</span>
+        <span class="value">{{ institution.allocatedPercent }}%</span>
+      </div>
+      <div class="balance-item" *ngIf="institution.allocatedPercent">
+        <span class="label">Total Funds in Goals:</span>
+        <span class="value">{{ formatCurrency(getTotalAllocatedFunds()) }}</span>
+      </div>
+    </div>
+
+    <div class="linked-goals-section" *ngIf="linkedGoalsDetails && linkedGoalsDetails.length > 0">
+      <h3>Linked Goals</h3>
+      <div class="goals-chips">
+        <mat-chip *ngFor="let goal of linkedGoalsDetails" (click)="navigateToGoal(goal.goalId)" class="goal-chip">
+          <mat-icon>flag</mat-icon>
+          {{ goal.name }}
+        </mat-chip>
+      </div>
     </div>
   </mat-card-content>
 </mat-card>
