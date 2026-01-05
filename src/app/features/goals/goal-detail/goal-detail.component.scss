@@ -1,0 +1,273 @@
+.header-actions {
+  display: flex;
+  align-items: center;
+  margin-bottom: 20px;
+
+  .spacer {
+    flex: 1;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 400px;
+}
+
+.goal-summary {
+  margin-bottom: 20px;
+
+  .description {
+    margin-bottom: 16px;
+
+    p {
+      margin: 0;
+      color: var(--text-secondary);
+      line-height: 1.5;
+    }
+  }
+
+  .status-chip {
+    margin-bottom: 24px;
+
+    mat-chip {
+      font-size: 12px;
+      min-height: 24px;
+      
+      &.status-completed {
+        background-color: #4caf50;
+        color: white;
+      }
+
+      &.status-near-complete {
+        background-color: #2196f3;
+        color: white;
+      }
+
+      &.status-in-progress {
+        background-color: #ff9800;
+        color: white;
+      }
+
+      &.status-just-started {
+        background-color: #9e9e9e;
+        color: white;
+      }
+
+      &.status-active {
+        background-color: #607d8b;
+        color: white;
+      }
+    }
+  }
+
+  .goal-progress {
+    .progress-header {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+      gap: 12px;
+
+      .progress-label {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+
+        .label {
+          font-size: 12px;
+          color: var(--text-secondary);
+          text-transform: uppercase;
+        }
+
+        .value {
+          font-size: 20px;
+          font-weight: 500;
+
+          &.current {
+            color: var(--primary-color);
+          }
+
+          &.target {
+            color: var(--text-primary);
+          }
+        }
+      }
+    }
+
+    .progress-bar {
+      height: 8px;
+      background-color: rgba(0, 0, 0, 0.1);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 8px;
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, var(--primary-color), #4caf50);
+        transition: width 0.3s ease;
+        border-radius: 4px;
+      }
+    }
+
+    .progress-percentage {
+      text-align: right;
+      font-size: 14px;
+      color: var(--text-secondary);
+      font-weight: 500;
+    }
+  }
+}
+
+.linked-institutions-card {
+  .empty-state {
+    text-align: center;
+    padding: 40px 20px;
+    color: var(--text-secondary);
+
+    mat-icon {
+      font-size: 48px;
+      width: 48px;
+      height: 48px;
+      color: var(--text-secondary);
+      opacity: 0.5;
+      margin-bottom: 12px;
+    }
+
+    p {
+      font-size: 14px;
+      margin: 0;
+    }
+  }
+
+  .institutions-list {
+    .institution-item {
+      padding: 16px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+      &:last-child {
+        border-bottom: none;
+      }
+
+      .institution-info {
+        .institution-header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 12px;
+
+          .institution-name {
+            font-weight: 500;
+            font-size: 16px;
+            color: var(--primary-color);
+            cursor: pointer;
+            text-decoration: none;
+            transition: opacity 0.2s ease;
+
+            &:hover {
+              opacity: 0.8;
+              text-decoration: underline;
+            }
+          }
+
+          .percentage-chip {
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 500;
+            font-size: 14px;
+            min-height: 28px;
+          }
+        }
+
+        .institution-details {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+
+            .detail-label {
+              color: var(--text-secondary);
+            }
+
+            .detail-value {
+              font-weight: 500;
+              color: var(--text-primary);
+            }
+
+            &.allocated {
+              .detail-value {
+                color: var(--primary-color);
+                font-size: 16px;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+
+  .total-summary {
+    border-top: 2px solid rgba(0, 0, 0, 0.12);
+    padding: 16px;
+    background-color: rgba(0, 0, 0, 0.02);
+
+    .summary-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+
+      .summary-label {
+        font-weight: 500;
+        font-size: 16px;
+        color: var(--text-primary);
+      }
+
+      .summary-value {
+        font-weight: 600;
+        font-size: 20px;
+        color: var(--primary-color);
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .goal-summary {
+    .goal-progress {
+      .progress-header {
+        flex-direction: column;
+
+        .progress-label {
+          width: 100%;
+        }
+      }
+    }
+  }
+
+  .linked-institutions-card {
+    .institutions-list {
+      .institution-item {
+        .institution-info {
+          .institution-header {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 8px;
+          }
+        }
+      }
+    }
+
+    .total-summary {
+      .summary-row {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+      }
+    }
+  }
+}

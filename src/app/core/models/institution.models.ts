@@ -15,6 +15,8 @@ export interface InstitutionResponse {
   currentBalance: number;
   createdAt: number;
   userId: string;
+  allocatedPercent?: number;
+  linkedGoals?: string[];
 }
 
 export interface GetInstitutionsResponse {

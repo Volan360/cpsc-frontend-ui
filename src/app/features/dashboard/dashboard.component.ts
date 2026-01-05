@@ -37,4 +37,8 @@ export class DashboardComponent implements OnInit {
   navigateToInstitutions(): void {
     this.router.navigate(['/institutions']);
   }
+
+  navigateToGoals(): void {
+    this.router.navigate(['/goals']);
+  }
 }
