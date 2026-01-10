@@ -19,6 +19,7 @@ import { ConfirmDialogComponent } from '@core/components/confirm-dialog/confirm-
 import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { forkJoin } from 'rxjs';
+import { encodeUuidForUrl } from '@core/utils/url.utils';
 
 @Component({
   selector: 'app-goals-list',
@@ -172,7 +173,7 @@ export class GoalsListComponent implements OnInit {
   }
 
   viewGoal(goal: GoalResponse): void {
-    this.router.navigate(['/goals', goal.goalId]);
+    this.router.navigate(['/goals', encodeUuidForUrl(goal.goalId)]);
   }
 
   /**

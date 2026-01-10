@@ -37,6 +37,10 @@
         </div>
       </div>
       <mat-divider></mat-divider>
+      <button mat-menu-item (click)="navigateToProfile()">
+        <mat-icon>settings</mat-icon>
+        <span>Profile Settings</span>
+      </button>
       <button mat-menu-item (click)="signOut()">
         <mat-icon>logout</mat-icon>
         <span>Sign Out</span>

@@ -39,6 +39,10 @@ export class AppComponent {
     this.router.navigate([route]);
   }
 
+  navigateToProfile(): void {
+    this.router.navigate(['/profile-settings']);
+  }
+
   signOut(): void {
     this.authService.signOut();
   }

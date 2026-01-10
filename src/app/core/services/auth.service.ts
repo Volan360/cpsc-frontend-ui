@@ -10,7 +10,13 @@ import {
   SignUpResponse,
   ConfirmSignUpRequest,
   UserProfile,
-  AuthState
+  AuthState,
+  ForgotPasswordRequest,
+  ForgotPasswordResponse,
+  ConfirmForgotPasswordRequest,
+  ConfirmForgotPasswordResponse,
+  UpdateScreenNameRequest,
+  UpdateScreenNameResponse
 } from '@core/models/auth.models';
 
 @Injectable({
@@ -119,6 +125,72 @@ export class AuthService {
         }),
         catchError(error => {
           console.error('Get profile error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Initiate forgot password flow
+   */
+  forgotPassword(request: ForgotPasswordRequest): Observable<ForgotPasswordResponse> {
+    return this.http.post<ForgotPasswordResponse>(`${environment.apiUrl}/auth/forgot-password`, request)
+      .pipe(
+        catchError(error => {
+          console.error('Forgot password error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Confirm forgot password with code and new password
+   */
+  confirmForgotPassword(request: ConfirmForgotPasswordRequest): Observable<ConfirmForgotPasswordResponse> {
+    return this.http.post<ConfirmForgotPasswordResponse>(`${environment.apiUrl}/auth/confirm-forgot-password`, request)
+      .pipe(
+        catchError(error => {
+          console.error('Confirm forgot password error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Update user's screen name
+   */
+  updateScreenName(request: UpdateScreenNameRequest): Observable<UpdateScreenNameResponse> {
+    return this.http.patch<UpdateScreenNameResponse>(`${environment.apiUrl}/secure/update-screen-name`, request)
+      .pipe(
+        tap(response => {
+          // Update the current user with new screen name
+          const currentUserData = this.currentUser();
+          if (currentUserData) {
+            const updatedUser = { ...currentUserData, screenName: response.screenName };
+            this.currentUser.set(updatedUser);
+            this.storeUser(updatedUser);
+          }
+        }),
+        catchError(error => {
+          console.error('Update screen name error:', error);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
+   * Delete user account permanently
+   */
+  deleteAccount(): Observable<void> {
+    return this.http.delete<void>(`${environment.apiUrl}/secure/delete-account`)
+      .pipe(
+        tap(() => {
+          // Clear all auth data after successful deletion
+          this.clearAuth();
+          this.router.navigate(['/auth/sign-in']);
+        }),
+        catchError(error => {
+          console.error('Delete account error:', error);
           return throwError(() => error);
         })
       );

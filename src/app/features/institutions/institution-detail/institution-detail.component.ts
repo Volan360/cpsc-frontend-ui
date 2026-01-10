@@ -24,6 +24,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { DIALOG_WIDTHS } from '@core/constants/app.constants';
 import { forkJoin } from 'rxjs';
+import { decodeUuidFromUrl, encodeUuidForUrl } from '@core/utils/url.utils';
 
 @Component({
   selector: 'app-institution-detail',
@@ -72,7 +73,8 @@ export class InstitutionDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.institutionId = this.route.snapshot.paramMap.get('id')!;
+    const encodedId = this.route.snapshot.paramMap.get('id')!;
+    this.institutionId = decodeUuidFromUrl(encodedId);
     this.loadInstitutionData();
   }
 
@@ -213,7 +215,7 @@ export class InstitutionDetailComponent implements OnInit {
   }
 
   navigateToGoal(goalId: string): void {
-    this.router.navigate(['/goals', goalId]);
+    this.router.navigate(['/goals', encodeUuidForUrl(goalId)]);
   }
 
   getTransactionClass(type: string): string {

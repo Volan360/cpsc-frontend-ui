@@ -1,0 +1,164 @@
+.profile-settings-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .back-button {
+    color: rgba(0, 0, 0, 0.7);
+  }
+
+  h1 {
+    margin: 0;
+    font-size: 28px;
+    font-weight: 500;
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.info-card,
+.settings-card,
+.danger-card {
+  mat-card-header {
+    margin-bottom: 16px;
+
+    mat-icon[mat-card-avatar] {
+      font-size: 40px;
+      width: 40px;
+      height: 40px;
+      line-height: 40px;
+    }
+  }
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 12px 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .label {
+    font-weight: 500;
+    color: rgba(0, 0, 0, 0.6);
+  }
+
+  .value {
+    color: rgba(0, 0, 0, 0.87);
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  .full-width {
+    width: 100%;
+  }
+
+  button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    height: 42px;
+
+    mat-icon {
+      margin: 0;
+      vertical-align: middle;
+    }
+
+    span {
+      vertical-align: middle;
+    }
+  }
+}
+
+.inline-spinner {
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.danger-card {
+  border: 2px solid #f44336;
+  background-color: #ffebee;
+
+  .danger-icon {
+    color: #f44336;
+  }
+
+  .danger-title {
+    color: #f44336;
+  }
+
+  .danger-description {
+    margin-bottom: 12px;
+    color: rgba(0, 0, 0, 0.87);
+  }
+
+  .danger-list {
+    margin: 12px 0;
+    padding-left: 20px;
+    color: rgba(0, 0, 0, 0.87);
+
+    li {
+      margin: 6px 0;
+    }
+  }
+
+  .danger-warning {
+    margin: 16px 0;
+    padding: 12px;
+    background-color: #fff3e0;
+    border-left: 4px solid #ff9800;
+    color: #e65100;
+    font-size: 14px;
+  }
+
+  .delete-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+
+    mat-icon {
+      margin: 0;
+      vertical-align: middle;
+    }
+
+    span {
+      vertical-align: middle;
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .profile-settings-container {
+    padding: 12px;
+  }
+
+  .header h1 {
+    font-size: 24px;
+  }
+
+  .info-row {
+    flex-direction: column;
+    gap: 4px;
+  }
+}

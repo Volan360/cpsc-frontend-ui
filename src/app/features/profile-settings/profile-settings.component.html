@@ -1,0 +1,120 @@
+<div class="profile-settings-container">
+  <div class="header">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Profile Settings</h1>
+  </div>
+
+  <div class="content">
+    <!-- User Information Card -->
+    <mat-card class="info-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>account_circle</mat-icon>
+        <mat-card-title>Account Information</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="info-row">
+          <span class="label">Email:</span>
+          <span class="value">{{ currentUser()?.email || 'Not available' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="label">Current Screen Name:</span>
+          <span class="value">{{ currentUser()?.screenName || 'Not set' }}</span>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Update Screen Name Card -->
+    <mat-card class="settings-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar>edit</mat-icon>
+        <mat-card-title>Update Screen Name</mat-card-title>
+        <mat-card-subtitle>Change your display name</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <form [formGroup]="screenNameForm" (ngSubmit)="updateScreenName()">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Screen Name</mat-label>
+            <input
+              matInput
+              type="text"
+              formControlName="screenName"
+              placeholder="Enter new screen name"
+            />
+            <mat-icon matPrefix>badge</mat-icon>
+            @if (screenName?.hasError('required') && screenName?.touched) {
+              <mat-error>Screen name is required</mat-error>
+            }
+            @if (screenName?.hasError('minlength') && screenName?.touched) {
+              <mat-error>Screen name must be at least 3 characters</mat-error>
+            }
+            @if (screenName?.hasError('maxlength') && screenName?.touched) {
+              <mat-error>Screen name cannot exceed 50 characters</mat-error>
+            }
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="screenNameForm.invalid || isUpdatingScreenName"
+          >
+            @if (isUpdatingScreenName) {
+              <mat-spinner diameter="20" class="inline-spinner"></mat-spinner>
+              <span>Updating...</span>
+            } @else {
+              <ng-container>
+                <mat-icon>save</mat-icon>
+                <span>Update Screen Name</span>
+              </ng-container>
+            }
+          </button>
+        </form>
+      </mat-card-content>
+    </mat-card>
+
+    <mat-divider></mat-divider>
+
+    <!-- Danger Zone Card -->
+    <mat-card class="danger-card">
+      <mat-card-header>
+        <mat-icon mat-card-avatar class="danger-icon">warning</mat-icon>
+        <mat-card-title class="danger-title">Danger Zone</mat-card-title>
+        <mat-card-subtitle>Irreversible actions</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <p class="danger-description">
+          Deleting your account will permanently remove all your data including:
+        </p>
+        <ul class="danger-list">
+          <li>All financial institutions</li>
+          <li>All transactions</li>
+          <li>All financial goals</li>
+          <li>Your user account</li>
+        </ul>
+        <p class="danger-warning">
+          <strong>This action cannot be undone!</strong>
+        </p>
+
+        <button
+          mat-raised-button
+          color="warn"
+          (click)="confirmDeleteAccount()"
+          [disabled]="isDeletingAccount"
+          class="delete-button"
+        >
+          @if (isDeletingAccount) {
+            <mat-spinner diameter="20" class="inline-spinner"></mat-spinner>
+            <span>Deleting Account...</span>
+          } @else {
+            <ng-container>
+              <mat-icon>delete_forever</mat-icon>
+              <span>Delete Account Permanently</span>
+            </ng-container>
+          }
+        </button>
+      </mat-card-content>
+    </mat-card>
+  </div>
+</div>

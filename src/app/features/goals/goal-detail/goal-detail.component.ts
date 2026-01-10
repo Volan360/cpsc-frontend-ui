@@ -17,6 +17,7 @@ import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { forkJoin } from 'rxjs';
 import { ConfirmDialogComponent } from '@core/components/confirm-dialog/confirm-dialog.component';
+import { decodeUuidFromUrl, encodeUuidForUrl } from '@core/utils/url.utils';
 
 @Component({
   selector: 'app-goal-detail',
@@ -51,7 +52,8 @@ export class GoalDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.goalId = this.route.snapshot.paramMap.get('id')!;
+    const encodedId = this.route.snapshot.paramMap.get('id')!;
+    this.goalId = decodeUuidFromUrl(encodedId);
     this.loadGoalData();
   }
 
@@ -87,7 +89,7 @@ export class GoalDetailComponent implements OnInit {
   }
 
   navigateToInstitution(institutionId: string): void {
-    this.router.navigate(['/institutions', institutionId]);
+    this.router.navigate(['/institutions', encodeUuidForUrl(institutionId)]);
   }
 
   completeGoal(): void {
