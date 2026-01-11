@@ -73,34 +73,22 @@ export class GoalService {
       throw new Error('Goal must have linked institutions and target amount');
     }
 
-    let totalWithdrawalAmount = 0;
-    const targetAmount = goal.targetAmount;
+    const transactionDetails = this.calculateWithdrawalTransactions(goal, institutions);
     const transactionObservables: Observable<any>[] = [];
 
-    const institutionEntries = Object.entries(goal.linkedInstitutions);
-
-    for (const [institutionId, percentage] of institutionEntries) {
-      if (totalWithdrawalAmount >= targetAmount) break;
-
-      const institution = institutions.find(i => i.institutionId === institutionId);
-      if (!institution) continue;
-
-      const allocatedAmount = (institution.currentBalance * percentage) / 100;
-      const remainingNeeded = targetAmount - totalWithdrawalAmount;
-      const withdrawalAmount = Math.min(allocatedAmount, remainingNeeded);
-
-      if (withdrawalAmount > 0) {
+    // Only create transactions for institutions with non-zero withdrawals
+    for (const transaction of transactionDetails) {
+      if (transaction.withdrawalAmount > 0) {
         const transactionRequest = {
           type: TransactionType.WITHDRAWAL,
-          amount: withdrawalAmount,
+          amount: transaction.withdrawalAmount,
           description: `Goal completion: ${goal.name}`,
           tags: ['goal-completion']
         };
 
         transactionObservables.push(
-          this.transactionService.createTransaction(institutionId, transactionRequest)
+          this.transactionService.createTransaction(transaction.institutionId, transactionRequest)
         );
-        totalWithdrawalAmount += withdrawalAmount;
       }
     }
 
@@ -135,5 +123,70 @@ export class GoalService {
       }
     }
     return total;
+  }
+
+  /**
+   * Calculate transaction preview for goal completion
+   */
+  calculateTransactionPreview(
+    goal: GoalResponse,
+    institutions: InstitutionResponse[]
+  ): Array<{ institutionId: string; institutionName: string; withdrawalAmount: number; percentage: number; currentBalance: number; remainingBalance: number }> {
+    const transactions = this.calculateWithdrawalTransactions(goal, institutions);
+    
+    return transactions.map(t => ({
+      institutionId: t.institutionId,
+      institutionName: t.institutionName,
+      withdrawalAmount: t.withdrawalAmount,
+      percentage: t.percentage,
+      currentBalance: t.currentBalance,
+      remainingBalance: t.remainingBalance
+    }));
+  }
+
+  /**
+   * Private method to calculate withdrawal transactions for goal completion
+   * This is the single source of truth for withdrawal calculation logic
+   */
+  private calculateWithdrawalTransactions(
+    goal: GoalResponse,
+    institutions: InstitutionResponse[]
+  ): Array<{ institutionId: string; institutionName: string; withdrawalAmount: number; percentage: number; currentBalance: number; remainingBalance: number }> {
+    if (!goal.linkedInstitutions || !goal.targetAmount) {
+      return [];
+    }
+
+    let totalWithdrawalAmount = 0;
+    const targetAmount = goal.targetAmount;
+    const transactions: Array<{ institutionId: string; institutionName: string; withdrawalAmount: number; percentage: number; currentBalance: number; remainingBalance: number }> = [];
+
+    const institutionEntries = Object.entries(goal.linkedInstitutions);
+
+    for (const [institutionId, percentage] of institutionEntries) {
+      const institution = institutions.find(i => i.institutionId === institutionId);
+      if (!institution) continue;
+
+      let withdrawalAmount = 0;
+      
+      // Only calculate withdrawal if target hasn't been met yet
+      if (totalWithdrawalAmount < targetAmount) {
+        const allocatedAmount = (institution.currentBalance * percentage) / 100;
+        const remainingNeeded = targetAmount - totalWithdrawalAmount;
+        withdrawalAmount = Math.min(allocatedAmount, remainingNeeded);
+        totalWithdrawalAmount += withdrawalAmount;
+      }
+
+      // Include all linked institutions, even with zero withdrawal
+      transactions.push({
+        institutionId,
+        institutionName: institution.institutionName,
+        withdrawalAmount,
+        percentage,
+        currentBalance: institution.currentBalance,
+        remainingBalance: institution.currentBalance - withdrawalAmount
+      });
+    }
+
+    return transactions;
   }
 }

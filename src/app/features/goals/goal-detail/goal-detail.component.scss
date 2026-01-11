@@ -2,9 +2,43 @@
   display: flex;
   align-items: center;
   margin-bottom: 20px;
+  gap: 8px;
 
   .spacer {
     flex: 1;
+  }
+
+  .complete-button {
+    background-color: #4caf50;
+    color: white;
+
+    &:hover:not([disabled]) {
+      background-color: #45a049;
+    }
+
+    &[disabled] {
+      background-color: rgba(76, 175, 80, 0.5);
+    }
+  }
+
+  @media (max-width: 600px) {
+    button[mat-raised-button] {
+      min-width: auto;
+      padding: 0;
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      
+      .button-text {
+        display: none;
+      }
+      
+      mat-icon {
+        margin: 0;
+      }
+    }
   }
 }
 
@@ -145,12 +179,23 @@
     .institution-item {
       padding: 16px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      transition: background-color 0.2s ease;
+
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.04);
+      }
 
       &:last-child {
         border-bottom: none;
       }
 
       .institution-info {
+        flex: 1;
+        min-width: 0;
         .institution-header {
           display: flex;
           justify-content: space-between;
@@ -160,15 +205,7 @@
           .institution-name {
             font-weight: 500;
             font-size: 16px;
-            color: var(--primary-color);
-            cursor: pointer;
-            text-decoration: none;
-            transition: opacity 0.2s ease;
-
-            &:hover {
-              opacity: 0.8;
-              text-decoration: underline;
-            }
+            color: var(--text-primary);
           }
 
           .percentage-chip {
@@ -207,6 +244,11 @@
             }
           }
         }
+      }
+
+      .chevron-icon {
+        color: var(--text-secondary);
+        flex-shrink: 0;
       }
     }
   }

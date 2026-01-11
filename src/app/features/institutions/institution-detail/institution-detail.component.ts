@@ -19,7 +19,9 @@ import { InstitutionResponse } from '@core/models/institution.models';
 import { TransactionResponse } from '@core/models/transaction.models';
 import { GoalResponse } from '@core/models/goal.models';
 import { CreateTransactionDialogComponent } from './create-transaction-dialog/create-transaction-dialog.component';
+import { CreateInstitutionDialogComponent } from '../institutions-list/create-institution-dialog/create-institution-dialog.component';
 import { FilterTransactionsDialogComponent, TransactionFilter } from './filter-transactions-dialog/filter-transactions-dialog.component';
+import { ConfirmDialogComponent } from '@core/components/confirm-dialog/confirm-dialog.component';
 import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { DIALOG_WIDTHS } from '@core/constants/app.constants';
@@ -158,39 +160,81 @@ export class InstitutionDetailComponent implements OnInit {
   deleteTransaction(transaction: TransactionResponse, event: Event): void {
     event.stopPropagation();
     
-    if (confirm('Are you sure you want to delete this transaction?')) {
-      this.transactionService.deleteTransaction(this.institutionId, transaction.transactionId).subscribe({
-        next: () => {
-          this.notificationService.success('Transaction deleted successfully');
-          this.loadTransactions();
-        },
-        error: (error) => {
-          console.error('Error deleting transaction:', error);
-          this.notificationService.error('Failed to delete transaction');
-        }
-      });
-    }
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Transaction',
+        message: 'Are you sure you want to delete this transaction? This action cannot be undone.',
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.transactionService.deleteTransaction(this.institutionId, transaction.transactionId).subscribe({
+          next: () => {
+            this.notificationService.success('Transaction deleted successfully');
+            this.loadTransactions();
+          },
+          error: (error) => {
+            console.error('Error deleting transaction:', error);
+            this.notificationService.error('Failed to delete transaction');
+          }
+        });
+      }
+    });
   }
 
   goBack(): void {
     this.router.navigate(['/institutions']);
   }
 
+  editInstitution(): void {
+    if (!this.institution) return;
+
+    const dialogRef = this.dialog.open(CreateInstitutionDialogComponent, {
+      width: '400px',
+      data: { institution: this.institution }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadInstitutionData();
+      }
+    });
+  }
+
   deleteInstitution(): void {
     if (!this.institution) return;
     
-    if (confirm(`Are you sure you want to delete ${this.institution.institutionName}? This will also delete all associated transactions.`)) {
-      this.institutionService.deleteInstitution(this.institution.institutionId).subscribe({
-        next: () => {
-          this.notificationService.success('Institution deleted successfully');
-          this.router.navigate(['/institutions']);
-        },
-        error: (error) => {
-          console.error('Error deleting institution:', error);
-          this.notificationService.error('Failed to delete institution');
-        }
-      });
-    }
+    const institutionId = this.institution.institutionId;
+    const institutionName = this.institution.institutionName;
+    
+    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
+      width: '400px',
+      data: {
+        title: 'Delete Institution',
+        message: `Are you sure you want to delete "${institutionName}"? This will also delete all associated transactions. This action cannot be undone.`,
+        confirmText: 'Delete',
+        cancelText: 'Cancel'
+      }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.institutionService.deleteInstitution(institutionId).subscribe({
+          next: () => {
+            this.notificationService.success('Institution deleted successfully');
+            this.router.navigate(['/institutions']);
+          },
+          error: (error) => {
+            console.error('Error deleting institution:', error);
+            this.notificationService.error('Failed to delete institution');
+          }
+        });
+      }
+    });
   }
 
   getCurrentBalance(): number {

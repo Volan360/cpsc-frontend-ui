@@ -64,13 +64,13 @@
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let goal">
           <button mat-icon-button 
-                  color="primary" 
+                  class="complete-goal-icon"
                   (click)="completeGoal(goal, $event)" 
                   matTooltip="Complete Goal"
                   *ngIf="canCompleteGoal(goal)">
             <mat-icon>check_circle</mat-icon>
           </button>
-          <button mat-icon-button (click)="editGoal(goal, $event)" matTooltip="Edit">
+          <button mat-icon-button color="primary" (click)="editGoal(goal, $event)" matTooltip="Edit">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button color="warn" (click)="deleteGoal(goal, $event)" matTooltip="Delete">
