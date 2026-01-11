@@ -17,6 +17,9 @@ import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { forkJoin } from 'rxjs';
 import { ConfirmDialogComponent } from '@core/components/confirm-dialog/confirm-dialog.component';
+import { CompleteGoalDialogComponent } from '../complete-goal-dialog/complete-goal-dialog.component';
+import { CreateGoalDialogComponent } from '../goals-list/create-goal-dialog/create-goal-dialog.component';
+import { decodeUuidFromUrl, encodeUuidForUrl } from '@core/utils/url.utils';
 
 @Component({
   selector: 'app-goal-detail',
@@ -51,7 +54,8 @@ export class GoalDetailComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    this.goalId = this.route.snapshot.paramMap.get('id')!;
+    const encodedId = this.route.snapshot.paramMap.get('id')!;
+    this.goalId = decodeUuidFromUrl(encodedId);
     this.loadGoalData();
   }
 
@@ -86,8 +90,23 @@ export class GoalDetailComponent implements OnInit {
     this.router.navigate(['/goals']);
   }
 
+  editGoal(): void {
+    if (!this.goal) return;
+
+    const dialogRef = this.dialog.open(CreateGoalDialogComponent, {
+      width: '500px',
+      data: { goal: this.goal, institutions: this.institutions }
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        this.loadGoalData();
+      }
+    });
+  }
+
   navigateToInstitution(institutionId: string): void {
-    this.router.navigate(['/institutions', institutionId]);
+    this.router.navigate(['/institutions', encodeUuidForUrl(institutionId)]);
   }
 
   completeGoal(): void {
@@ -96,13 +115,17 @@ export class GoalDetailComponent implements OnInit {
       return;
     }
 
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+    // Calculate transaction preview
+    const transactionPreview = this.goalService.calculateTransactionPreview(this.goal, this.institutions);
+
+    const dialogRef = this.dialog.open(CompleteGoalDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
       data: {
-        title: 'Complete Goal',
-        message: `This will withdraw ${this.formatCurrency(this.goal.targetAmount)} from your linked institutions and complete the goal "${this.goal.name}". Continue?`,
-        confirmText: 'Complete Goal',
-        cancelText: 'Cancel'
+        goal: this.goal,
+        institutions: this.institutions,
+        transactions: transactionPreview,
+        totalAmount: this.goal.targetAmount
       }
     });
 

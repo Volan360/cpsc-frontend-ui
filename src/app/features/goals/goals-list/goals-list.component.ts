@@ -16,9 +16,11 @@ import { GoalResponse } from '@core/models/goal.models';
 import { InstitutionResponse } from '@core/models/institution.models';
 import { CreateGoalDialogComponent } from './create-goal-dialog/create-goal-dialog.component';
 import { ConfirmDialogComponent } from '@core/components/confirm-dialog/confirm-dialog.component';
+import { CompleteGoalDialogComponent } from '../complete-goal-dialog/complete-goal-dialog.component';
 import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { forkJoin } from 'rxjs';
+import { encodeUuidForUrl } from '@core/utils/url.utils';
 
 @Component({
   selector: 'app-goals-list',
@@ -145,13 +147,17 @@ export class GoalsListComponent implements OnInit {
     
     if (!goal.targetAmount) return;
 
-    const dialogRef = this.dialog.open(ConfirmDialogComponent, {
-      width: '400px',
+    // Calculate transaction preview
+    const transactionPreview = this.goalService.calculateTransactionPreview(goal, this.institutions);
+
+    const dialogRef = this.dialog.open(CompleteGoalDialogComponent, {
+      width: '600px',
+      maxWidth: '95vw',
       data: {
-        title: 'Complete Goal',
-        message: `This will withdraw ${this.formatCurrency(goal.targetAmount)} from your linked institutions and complete the goal "${goal.name}". Continue?`,
-        confirmText: 'Complete Goal',
-        cancelText: 'Cancel'
+        goal: goal,
+        institutions: this.institutions,
+        transactions: transactionPreview,
+        totalAmount: goal.targetAmount
       }
     });
 
@@ -172,7 +178,7 @@ export class GoalsListComponent implements OnInit {
   }
 
   viewGoal(goal: GoalResponse): void {
-    this.router.navigate(['/goals', goal.goalId]);
+    this.router.navigate(['/goals', encodeUuidForUrl(goal.goalId)]);
   }
 
   /**

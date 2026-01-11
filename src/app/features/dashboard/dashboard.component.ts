@@ -41,4 +41,8 @@ export class DashboardComponent implements OnInit {
   navigateToGoals(): void {
     this.router.navigate(['/goals']);
   }
+
+  navigateToProfileSettings(): void {
+    this.router.navigate(['/profile-settings']);
+  }
 }

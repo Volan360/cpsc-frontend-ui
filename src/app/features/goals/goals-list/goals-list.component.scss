@@ -5,6 +5,14 @@
   align-items: center;
 }
 
+.complete-goal-icon {
+  color: #4caf50;
+
+  &:hover {
+    background-color: rgba(76, 175, 80, 0.1);
+  }
+}
+
 .loading-container {
   display: flex;
   justify-content: center;

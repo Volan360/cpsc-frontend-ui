@@ -15,6 +15,7 @@ import { InstitutionResponse } from '@core/models/institution.models';
 import { CreateInstitutionDialogComponent } from './create-institution-dialog/create-institution-dialog.component';
 import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
+import { encodeUuidForUrl } from '@core/utils/url.utils';
 
 @Component({
   selector: 'app-institutions-list',
@@ -101,7 +102,7 @@ export class InstitutionsListComponent implements OnInit {
   }
 
   viewInstitution(institution: InstitutionResponse): void {
-    this.router.navigate(['/institutions', institution.institutionId]);
+    this.router.navigate(['/institutions', encodeUuidForUrl(institution.institutionId)]);
   }
 
   formatDate = formatDate;

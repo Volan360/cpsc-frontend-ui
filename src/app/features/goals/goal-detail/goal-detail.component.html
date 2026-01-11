@@ -5,16 +5,20 @@
   <span class="spacer"></span>
   <button 
     mat-raised-button 
-    color="primary" 
+    class="complete-button" 
     (click)="completeGoal()"
     *ngIf="goal && goal.targetAmount && calculateCurrentAmount() >= goal.targetAmount"
     [disabled]="loading">
     <mat-icon>check_circle</mat-icon>
-    Complete Goal
+    <span class="button-text">Complete Goal</span>
+  </button>
+  <button mat-raised-button color="primary" (click)="editGoal()">
+    <mat-icon>edit</mat-icon>
+    <span class="button-text">Edit Goal</span>
   </button>
   <button mat-raised-button color="warn" (click)="deleteGoal()">
     <mat-icon>delete</mat-icon>
-    Delete Goal
+    <span class="button-text">Delete Goal</span>
   </button>
 </div>
 
@@ -75,10 +79,12 @@
       </div>
 
       <div class="institutions-list" *ngIf="goal.linkedInstitutions && getLinkedInstitutionsKeys().length > 0">
-        <div class="institution-item" *ngFor="let entry of goal.linkedInstitutions | keyvalue">
+        <div class="institution-item" 
+             *ngFor="let entry of goal.linkedInstitutions | keyvalue"
+             (click)="navigateToInstitution(entry.key)">
           <div class="institution-info">
             <div class="institution-header">
-              <a class="institution-name" (click)="navigateToInstitution(entry.key)">{{ getInstitution(entry.key)?.institutionName || 'Unknown Institution' }}</a>
+              <span class="institution-name">{{ getInstitution(entry.key)?.institutionName || 'Unknown Institution' }}</span>
               <mat-chip class="percentage-chip">{{ entry.value }}%</mat-chip>
             </div>
             <div class="institution-details">
@@ -92,6 +98,7 @@
               </div>
             </div>
           </div>
+          <mat-icon class="chevron-icon">chevron_right</mat-icon>
         </div>
       </div>
 

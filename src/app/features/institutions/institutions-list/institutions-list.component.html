@@ -44,7 +44,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let institution">
-          <button mat-icon-button (click)="editInstitution(institution, $event)" matTooltip="Edit">
+          <button mat-icon-button color="primary" (click)="editInstitution(institution, $event)" matTooltip="Edit">
             <mat-icon>edit</mat-icon>
           </button>
         </td>

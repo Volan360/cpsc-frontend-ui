@@ -1,0 +1,66 @@
+<h2 mat-dialog-title>
+  Complete Goal
+</h2>
+
+<mat-dialog-content>
+  <div class="goal-info">
+    <h3>{{ data.goal.name }}</h3>
+    <p class="target-amount">Target: {{ formatCurrency(data.totalAmount) }}</p>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="transactions-section">
+    <h4>The following withdrawal transactions will be created:</h4>
+    
+    <div class="transaction-list">
+      <div class="transaction-item" *ngFor="let transaction of data.transactions" [class.no-withdrawal]="transaction.withdrawalAmount === 0">
+        <div class="transaction-header">
+          <mat-icon class="institution-icon">account_balance</mat-icon>
+          <span class="institution-name">{{ transaction.institutionName }}</span>
+          <span class="no-withdrawal-badge" *ngIf="transaction.withdrawalAmount === 0">No withdrawal needed</span>
+        </div>
+        <div class="transaction-details">
+          <span class="amount withdrawal" *ngIf="transaction.withdrawalAmount > 0">{{ formatCurrency(transaction.withdrawalAmount) }}</span>
+          <span class="amount no-change" *ngIf="transaction.withdrawalAmount === 0">{{ formatCurrency(0) }}</span>
+        </div>
+        <div class="balance-details">
+          <div class="balance-row">
+            <span class="balance-label">Current Balance:</span>
+            <span class="balance-value">{{ formatCurrency(transaction.currentBalance) }}</span>
+          </div>
+          <div class="balance-row">
+            <span class="balance-label">After Withdrawal:</span>
+            <span class="balance-value remaining" [class.unchanged]="transaction.withdrawalAmount === 0">{{ formatCurrency(transaction.remainingBalance) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  <div class="summary">
+    <div class="summary-row">
+      <span class="label">Total Withdrawal:</span>
+      <span class="value total">{{ formatCurrency(data.totalAmount) }}</span>
+    </div>
+    <div class="summary-row">
+      <span class="label">Transaction Tag:</span>
+      <span class="value tag">"goal-completion"</span>
+    </div>
+  </div>
+
+  <div class="warning">
+    <mat-icon>warning</mat-icon>
+    <p>This action cannot be undone. The goal will be deleted after withdrawals are processed.</p>
+  </div>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button mat-raised-button color="primary" (click)="onConfirm()">
+    <mat-icon>check</mat-icon>
+    Complete Goal
+  </button>
+</mat-dialog-actions>

@@ -3,9 +3,13 @@
     <mat-icon>arrow_back</mat-icon>
   </button>
   <span class="spacer"></span>
+  <button mat-raised-button color="primary" (click)="editInstitution()">
+    <mat-icon>edit</mat-icon>
+    <span class="button-text">Edit Institution</span>
+  </button>
   <button mat-raised-button color="warn" (click)="deleteInstitution()">
     <mat-icon>delete</mat-icon>
-    Delete Institution
+    <span class="button-text">Delete Institution</span>
   </button>
 </div>
 
@@ -141,7 +145,7 @@
       <ng-container matColumnDef="actions">
         <th mat-header-cell *matHeaderCellDef>Actions</th>
         <td mat-cell *matCellDef="let transaction">
-          <button mat-icon-button (click)="editTransaction(transaction, $event)" matTooltip="Edit">
+          <button mat-icon-button color="primary" (click)="editTransaction(transaction, $event)" matTooltip="Edit">
             <mat-icon>edit</mat-icon>
           </button>
           <button mat-icon-button color="warn" (click)="deleteTransaction(transaction, $event)" matTooltip="Delete">

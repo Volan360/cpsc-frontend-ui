@@ -47,6 +47,35 @@ export interface UserProfile {
   authenticated?: boolean;
 }
 
+export interface ForgotPasswordRequest {
+  email: string;
+}
+
+export interface ForgotPasswordResponse {
+  message: string;
+  deliveryMedium?: string;
+  destination?: string;
+}
+
+export interface ConfirmForgotPasswordRequest {
+  email: string;
+  confirmationCode: string;
+  newPassword: string;
+}
+
+export interface ConfirmForgotPasswordResponse {
+  message: string;
+}
+
+export interface UpdateScreenNameRequest {
+  screenName: string;
+}
+
+export interface UpdateScreenNameResponse {
+  message: string;
+  screenName: string;
+}
+
 export interface AuthState {
   isAuthenticated: boolean;
   user: UserProfile | null;
