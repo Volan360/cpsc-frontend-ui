@@ -173,6 +173,12 @@ export class CreateTransactionDialogComponent implements OnInit {
     if (this.transactionForm.valid && !this.submitting) {
       this.submitting = true;
       
+      // Add any pending tag in the input field before submitting
+      const pendingTag = this.tagControl.value?.trim();
+      if (pendingTag && !this.tags.includes(pendingTag)) {
+        this.tags.push(pendingTag);
+      }
+      
       const formValue = this.transactionForm.value;
       const requestData: any = {
         type: formValue.type,
