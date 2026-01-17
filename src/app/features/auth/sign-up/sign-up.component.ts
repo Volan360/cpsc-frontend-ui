@@ -1,6 +1,6 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,6 +12,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 import { AuthService } from '@core/services/auth.service';
 import { SignUpRequest } from '@core/models/auth.models';
+import { PasswordRequirementsComponent } from '@shared/components/password-requirements/password-requirements.component';
 
 @Component({
   selector: 'app-sign-up',
@@ -26,7 +27,8 @@ import { SignUpRequest } from '@core/models/auth.models';
     MatButtonModule,
     MatIconModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    PasswordRequirementsComponent
   ],
   templateUrl: './sign-up.component.html',
   styleUrl: './sign-up.component.scss'
@@ -36,6 +38,7 @@ export class SignUpComponent implements OnInit {
   loading = signal(false);
   hidePassword = signal(true);
   hideConfirmPassword = signal(true);
+  showPasswordRequirements = signal(false);
 
   constructor(
     private fb: FormBuilder,
@@ -179,5 +182,9 @@ export class SignUpComponent implements OnInit {
 
   private capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
+  }
+
+  get passwordFormControl() {
+    return this.signUpForm.get('password') as FormControl;
   }
 }

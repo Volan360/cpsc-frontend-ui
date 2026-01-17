@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, FormControl, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterModule, ActivatedRoute } from '@angular/router';
 import { MatCardModule } from '@angular/material/card';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -11,6 +11,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 
 import { AuthService } from '@core/services/auth.service';
+import { PasswordRequirementsComponent } from '@shared/components/password-requirements/password-requirements.component';
 
 @Component({
   selector: 'app-reset-password',
@@ -25,7 +26,8 @@ import { AuthService } from '@core/services/auth.service';
     MatButtonModule,
     MatIconModule,
     MatSnackBarModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    PasswordRequirementsComponent
   ],
   templateUrl: './reset-password.component.html',
   styleUrl: './reset-password.component.scss'
@@ -35,6 +37,7 @@ export class ResetPasswordComponent implements OnInit {
   isLoading = false;
   hidePassword = true;
   hideConfirmPassword = true;
+  showPasswordRequirements = false;
 
   constructor(
     private fb: FormBuilder,
@@ -114,5 +117,9 @@ export class ResetPasswordComponent implements OnInit {
 
   get confirmPassword() {
     return this.resetPasswordForm.get('confirmPassword');
+  }
+
+  get newPasswordFormControl() {
+    return this.resetPasswordForm.get('newPassword') as FormControl;
   }
 }
