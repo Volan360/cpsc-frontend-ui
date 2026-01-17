@@ -3,6 +3,11 @@ import { authGuard } from './core/guards/auth.guard';
 
 export const routes: Routes = [
   {
+    path: '',
+    loadComponent: () => import('./features/landing/landing.component').then(m => m.LandingComponent),
+    pathMatch: 'full'
+  },
+  {
     path: 'auth',
     loadChildren: () => import('./features/auth/auth.routes').then(m => m.AUTH_ROUTES)
   },
@@ -27,12 +32,7 @@ export const routes: Routes = [
     canActivate: [authGuard]
   },
   {
-    path: '',
-    redirectTo: '/auth/sign-in',
-    pathMatch: 'full'
-  },
-  {
     path: '**',
-    redirectTo: '/auth/sign-in'
+    redirectTo: '/'
   }
 ];

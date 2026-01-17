@@ -1,0 +1,112 @@
+<div class="landing-page">
+  <!-- Hero Section with Parallax -->
+  <section class="hero">
+    <div class="hero-background"></div>
+    
+    <div class="hero-content" *ngIf="showContent" @fadeInUp>
+      <div class="logo-wrapper">
+        <mat-icon class="logo-icon">account_balance_wallet</mat-icon>
+      </div>
+      <h1 class="hero-title">CPSC Cornerstone</h1>
+      <p class="hero-subtitle">Master Your Financial Future</p>
+      <p class="hero-description">
+        The complete personal finance platform to track, analyze, and optimize your money across all accounts and goals.
+      </p>
+      <div class="cta-buttons">
+        <button mat-raised-button color="primary" class="cta-primary" (click)="navigateToSignUp()">
+          <span>Get Started</span>
+          <mat-icon>arrow_forward</mat-icon>
+        </button>
+        <button mat-stroked-button class="cta-secondary" (click)="navigateToSignIn()">
+          Sign In
+        </button>
+      </div>
+    </div>
+
+    <div class="scroll-indicator">
+      <mat-icon>keyboard_arrow_down</mat-icon>
+    </div>
+  </section>
+
+  <!-- Features Section -->
+  <section class="features-section" [class.visible]="isVisible.features">
+    <div class="container">
+      <div class="section-title">
+        <h2>Powerful Features</h2>
+        <p>Everything you need to take control of your finances</p>
+      </div>
+
+      <div class="features-grid">
+        <div *ngFor="let feature of features; let i = index" 
+             class="feature-card"
+             [style.animation-delay]="(i * 150) + 'ms'">
+          <div class="feature-icon" [style.background]="feature.color">
+            <mat-icon>{{ feature.icon }}</mat-icon>
+          </div>
+          <h3>{{ feature.title }}</h3>
+          <p>{{ feature.description }}</p>
+          <div class="feature-hover-effect"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- How It Works -->
+  <section class="how-it-works" [class.visible]="isVisible.howItWorks">
+    <div class="container">
+      <div class="section-title" @fadeInUp>
+        <h2>Get Started in Minutes</h2>
+        <p>Simple, powerful, and intuitive</p>
+      </div>
+
+      <div class="steps">
+        <div class="step" @fadeInUp>
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <h3>Add Your Institutions</h3>
+            <p>Connect your banks, credit cards, and investment accounts to see everything in one place.</p>
+          </div>
+        </div>
+
+        <div class="step" @fadeInUp>
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <h3>Track Transactions</h3>
+            <p>Log deposits, withdrawals, and transfers with custom tags for complete clarity.</p>
+          </div>
+        </div>
+
+        <div class="step" @fadeInUp>
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <h3>Achieve Your Goals</h3>
+            <p>Set financial targets and watch your progress as you build wealth over time.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Final CTA -->
+  <section class="final-cta">
+    <div class="container" @fadeInUp>
+      <h2>Ready to Transform Your Finances?</h2>
+      <p>Join CPSC Cornerstone today and take control of your financial future.</p>
+      <button mat-raised-button color="primary" class="cta-large" (click)="navigateToSignUp()">
+        Create Free Account
+      </button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2026 CPSC Cornerstone. All rights reserved.</p>
+      <div class="footer-links">
+        <a routerLink="/auth/sign-in">Sign In</a>
+        <span>•</span>
+        <a routerLink="/auth/sign-up">Sign Up</a>
+      </div>
+    </div>
+  </footer>
+</div>
