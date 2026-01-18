@@ -25,25 +25,10 @@ export interface ConfirmDialogData {
     </mat-dialog-content>
     <mat-dialog-actions align="end">
       <button mat-button (click)="onCancel()">{{ data.cancelText || 'Cancel' }}</button>
-      <button mat-raised-button color="warn" (click)="onConfirm()">{{ data.confirmText || 'Confirm' }}</button>
+      <button mat-raised-button class="delete-button" (click)="onConfirm()">{{ data.confirmText || 'Confirm' }}</button>
     </mat-dialog-actions>
   `,
-  styles: [`
-    mat-dialog-content {
-      min-width: 300px;
-      padding: 20px 24px;
-    }
-
-    mat-dialog-actions {
-      padding: 16px 24px;
-      margin: 0;
-    }
-
-    p {
-      margin: 0;
-      line-height: 1.5;
-    }
-  `]
+  styleUrl: './confirm-dialog.component.scss'
 })
 export class ConfirmDialogComponent {
   constructor(

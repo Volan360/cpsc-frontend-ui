@@ -3,11 +3,11 @@
     <mat-icon>arrow_back</mat-icon>
   </button>
   <span class="spacer"></span>
-  <button mat-raised-button color="primary" (click)="editInstitution()">
+  <button mat-raised-button color="primary" (click)="editInstitution()" class="edit-button">
     <mat-icon>edit</mat-icon>
     <span class="button-text">Edit Institution</span>
   </button>
-  <button mat-raised-button color="warn" (click)="deleteInstitution()">
+  <button mat-raised-button color="warn" (click)="deleteInstitution()" class="delete-button">
     <mat-icon>delete</mat-icon>
     <span class="button-text">Delete Institution</span>
   </button>
@@ -60,7 +60,7 @@
   
   <mat-card-content>
     <div class="actions-bar">
-      <button mat-raised-button color="primary" (click)="openCreateTransactionDialog()">
+      <button mat-raised-button color="primary" (click)="openCreateTransactionDialog()" class="add-button">
         <mat-icon>add</mat-icon>
         Add Transaction
       </button>
@@ -129,7 +129,7 @@
         <th mat-header-cell *matHeaderCellDef>Tags</th>
         <td mat-cell *matCellDef="let transaction">
           <mat-chip-set *ngIf="transaction.tags && transaction.tags.length > 0">
-            <mat-chip *ngFor="let tag of transaction.tags">{{ tag }}</mat-chip>
+            <mat-chip *ngFor="let tag of transaction.tags" (click)="filterByTag(tag, $event)" class="clickable-tag">{{ tag }}</mat-chip>
           </mat-chip-set>
           <span *ngIf="!transaction.tags || transaction.tags.length === 0">-</span>
         </td>
@@ -204,7 +204,7 @@
             <div class="detail-row" *ngIf="transaction.tags && transaction.tags.length > 0">
               <span class="detail-label">Tags:</span>
               <mat-chip-set class="detail-value">
-                <mat-chip *ngFor="let tag of transaction.tags">{{ tag }}</mat-chip>
+                <mat-chip *ngFor="let tag of transaction.tags" (click)="filterByTag(tag, $event)" class="clickable-tag">{{ tag }}</mat-chip>
               </mat-chip-set>
             </div>
 

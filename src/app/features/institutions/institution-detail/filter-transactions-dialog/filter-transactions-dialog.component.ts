@@ -62,16 +62,18 @@ export class FilterTransactionsDialogComponent implements OnInit {
   maxDate = getMaxDate(); // Prevent future dates
   allTags: string[] = [];
   selectedTags: string[] = [];
+  expandTagSection = false;
 
   constructor(
     private fb: FormBuilder,
     private dialogRef: MatDialogRef<FilterTransactionsDialogComponent>,
     private transactionService: TransactionService,
     private institutionService: InstitutionService,
-    @Inject(MAT_DIALOG_DATA) public data: { institutionId: string; existingFilter?: TransactionFilter }
+    @Inject(MAT_DIALOG_DATA) public data: { institutionId: string; existingFilter?: TransactionFilter; expandTags?: boolean }
   ) {
     // Use existing filter values if available, otherwise use defaults
     const existingFilter = this.data.existingFilter;
+    this.expandTagSection = this.data.expandTags || false;
     
     this.filterForm = this.fb.group({
       dateFilterEnabled: [existingFilter?.startDate !== undefined || existingFilter?.endDate !== undefined],

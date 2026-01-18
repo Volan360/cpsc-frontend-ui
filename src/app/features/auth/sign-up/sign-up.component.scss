@@ -1,12 +1,13 @@
 .sign-up-container {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-start;
   min-height: 100vh;
+  height: auto;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 20px;
+  padding: 40px 20px;
   position: relative;
-  overflow: hidden;
+  box-sizing: border-box;
 
   &::before {
     content: '';

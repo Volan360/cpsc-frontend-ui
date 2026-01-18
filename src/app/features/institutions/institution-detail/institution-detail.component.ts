@@ -286,6 +286,34 @@ export class InstitutionDetailComponent implements OnInit {
     });
   }
 
+  filterByTag(tag: string, event: Event): void {
+    event.stopPropagation();
+    
+    const dialogRef = this.dialog.open(FilterTransactionsDialogComponent, {
+      width: DIALOG_WIDTHS.MEDIUM,
+      data: { 
+        institutionId: this.institutionId,
+        expandTags: true,
+        existingFilter: this.activeFilter ? {
+          ...this.activeFilter,
+          tags: [tag],
+          tagFilterMode: 'any' as const
+        } : {
+          tags: [tag],
+          tagFilterMode: 'any' as const,
+          filterType: 'on' as const
+        }
+      }
+    });
+
+    dialogRef.afterClosed().subscribe((filter: TransactionFilter | undefined) => {
+      if (filter) {
+        this.activeFilter = filter;
+        this.applyFilter();
+      }
+    });
+  }
+
   clearFilter(): void {
     this.activeFilter = undefined;
     this.applyFilter();

@@ -1,0 +1,79 @@
+@import '../../../styles/theme';
+
+h2[mat-dialog-title] {
+  @include gradient-text;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0;
+  padding: 24px 24px 16px;
+}
+
+mat-dialog-content {
+  min-width: 300px;
+  padding: 20px 24px;
+  color: var(--text-primary);
+
+  p {
+    margin: 0;
+    line-height: 1.5;
+    font-size: 1rem;
+  }
+}
+
+mat-dialog-actions {
+  padding: 16px 24px;
+  margin: 0;
+  gap: 12px;
+
+  button {
+    min-width: 80px;
+    font-weight: 500;
+    border-radius: var(--radius-md);
+    transition: all 0.3s ease;
+
+    &[mat-button] {
+      color: var(--text-secondary);
+
+      &:hover {
+        background-color: rgba(102, 126, 234, 0.1);
+      }
+    }
+
+    &[mat-raised-button].delete-button {
+      background: linear-gradient(135deg, #FF6B6B 0%, #EE5A52 100%);
+      color: white;
+      border: none;
+      box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+
+      &:hover {
+        box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  mat-dialog-content {
+    min-width: 250px;
+    padding: 16px 20px;
+  }
+
+  h2[mat-dialog-title] {
+    font-size: 1.25rem;
+    padding: 20px 20px 12px;
+  }
+
+  mat-dialog-actions {
+    padding: 12px 20px;
+    gap: 8px;
+
+    button {
+      min-width: 70px;
+    }
+  }
+}
