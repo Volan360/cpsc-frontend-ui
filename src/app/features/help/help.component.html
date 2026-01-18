@@ -1,0 +1,156 @@
+<div class="help-container">
+  <div class="help-header">
+    <h1>Help & Documentation</h1>
+    <p class="subtitle">Learn how to make the most of CPSC Cornerstone</p>
+  </div>
+
+  <div class="help-content">
+    <!-- Getting Started -->
+    <section class="help-section">
+      <div class="section-icon">
+        <mat-icon>rocket_launch</mat-icon>
+      </div>
+      <h2>Getting Started</h2>
+      <p>
+        CPSC Cornerstone is a comprehensive financial management platform that helps you track your institutions, 
+        manage savings goals, and monitor transactions all in one place.
+      </p>
+    </section>
+
+    <!-- Dashboard -->
+    <section class="help-section">
+      <div class="section-icon">
+        <mat-icon>dashboard</mat-icon>
+      </div>
+      <h2>Dashboard</h2>
+      <p>
+        The dashboard provides an at-a-glance view of your financial overview. It displays:
+      </p>
+      <ul>
+        <li><strong>Total Balance:</strong> Combined balance across all your financial institutions</li>
+        <li><strong>Active Goals:</strong> Number of savings goals you're currently working towards</li>
+        <li><strong>Recent Transactions:</strong> Your latest financial activities</li>
+        <li><strong>Quick Actions:</strong> Easy access to create new institutions, goals, and transactions</li>
+      </ul>
+    </section>
+
+    <!-- Institutions -->
+    <section class="help-section">
+      <div class="section-icon">
+        <mat-icon>account_balance</mat-icon>
+      </div>
+      <h2>Institutions</h2>
+      <p>
+        Manage all your financial institutions (banks, credit unions, investment accounts) in one place.
+      </p>
+      <h3>Creating an Institution</h3>
+      <ul>
+        <li>Click "Create Institution" from the dashboard or institutions page</li>
+        <li>Enter the institution name and opening balance</li>
+        <li>The current balance will be automatically calculated based on your transactions</li>
+      </ul>
+      <h3>Institution Details</h3>
+      <ul>
+        <li><strong>View Transactions:</strong> See all transactions associated with this institution</li>
+        <li><strong>Filter by Tags:</strong> Click on transaction tags to filter by category</li>
+        <li><strong>Add Transactions:</strong> Record deposits, withdrawals, and transfers</li>
+        <li><strong>Edit/Delete:</strong> Update institution details or remove institutions you no longer use</li>
+      </ul>
+    </section>
+
+    <!-- Goals -->
+    <section class="help-section">
+      <div class="section-icon">
+        <mat-icon>flag</mat-icon>
+      </div>
+      <h2>Goals</h2>
+      <p>
+        Set and track savings goals to help you reach your financial objectives.
+      </p>
+      <h3>Creating a Goal</h3>
+      <ul>
+        <li>Click "Create Goal" and enter a name and target amount</li>
+        <li>Add one or more institutions to allocate funds towards this goal</li>
+        <li>Set allocation amounts for each institution</li>
+        <li>Track your progress with the visual progress bar</li>
+      </ul>
+      <h3>Goal Details</h3>
+      <ul>
+        <li><strong>Progress Tracking:</strong> Visual progress bar shows how close you are to your target</li>
+        <li><strong>Institution Allocations:</strong> See which institutions are contributing to this goal</li>
+        <li><strong>Complete Goal:</strong> Mark a goal as complete when you've reached your target</li>
+        <li><strong>Transaction History:</strong> View all transactions linked to this goal</li>
+      </ul>
+    </section>
+
+    <!-- Transactions -->
+    <section class="help-section">
+      <div class="section-icon">
+        <mat-icon>receipt_long</mat-icon>
+      </div>
+      <h2>Transactions</h2>
+      <p>
+        Record and categorize all your financial transactions for accurate tracking.
+      </p>
+      <h3>Transaction Types</h3>
+      <ul>
+        <li><strong>Deposit:</strong> Money added to an institution (positive amount)</li>
+        <li><strong>Withdrawal:</strong> Money removed from an institution (negative amount)</li>
+      </ul>
+      <h3>Transaction Features</h3>
+      <ul>
+        <li><strong>Tags:</strong> Categorize transactions with custom tags (e.g., "Groceries", "Salary", "Bills"). Click tags in transaction lists to automatically filter by that category</li>
+        <li><strong>Notes:</strong> Add descriptions to remember transaction details</li>
+        <li><strong>Filtering:</strong> Filter transactions by date range, amount, tags, or institution</li>
+      </ul>
+    </section>
+
+    <!-- Profile Settings -->
+    <section class="help-section">
+      <div class="section-icon">
+        <mat-icon>settings</mat-icon>
+      </div>
+      <h2>Profile Settings</h2>
+      <p>
+        Manage your account information and preferences.
+      </p>
+      <ul>
+        <li><strong>Update Screen Name:</strong> Change your display name</li>
+        <li><strong>Change Password:</strong> Update your account password for security</li>
+        <li><strong>Delete Account:</strong> Permanently remove your account and all associated data</li>
+      </ul>
+    </section>
+
+    <!-- Tips & Best Practices -->
+    <section class="help-section highlight">
+      <div class="section-icon">
+        <mat-icon>lightbulb</mat-icon>
+      </div>
+      <h2>Tips & Best Practices</h2>
+      <ul>
+        <li><strong>Use Tags Consistently:</strong> Create a standard set of tags for better organization</li>
+        <li><strong>Regular Updates:</strong> Record transactions promptly for accurate balances</li>
+        <li><strong>Set Realistic Goals:</strong> Break large goals into smaller, achievable milestones</li>
+        <li><strong>Review Progress:</strong> Check your dashboard regularly to stay on track</li>
+        <li><strong>Filter Transactions:</strong> Use filters to analyze spending patterns by category</li>
+        <li><strong>Complete Goals:</strong> Mark goals as complete to maintain motivation and see your achievements</li>
+      </ul>
+    </section>
+
+    <!-- Need More Help -->
+    <section class="help-section cta">
+      <div class="section-icon">
+        <mat-icon>support_agent</mat-icon>
+      </div>
+      <h2>Need More Help?</h2>
+      <p>
+        If you have questions or encounter any issues, feel free to explore the application 
+        or reach out to support for assistance.
+      </p>
+      <button mat-raised-button class="back-button" (click)="goToDashboard()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Dashboard
+      </button>
+    </section>
+  </div>
+</div>

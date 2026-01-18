@@ -188,7 +188,8 @@ export class GoalDetailComponent implements OnInit {
       return 0;
     }
     const current = this.calculateCurrentAmount();
-    return Math.min(100, (current / this.goal.targetAmount) * 100);
+    const percentage = (current / this.goal.targetAmount) * 100;
+    return Math.min(100, Math.max(0, percentage));
   }
 
   /**

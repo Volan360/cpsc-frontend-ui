@@ -43,6 +43,14 @@ export class AppComponent {
     this.router.navigate(['/profile-settings']);
   }
 
+  getUserInitial(): string {
+    const user = this.currentUser();
+    if (user?.screenName) {
+      return user.screenName.charAt(0).toUpperCase();
+    }
+    return 'U';
+  }
+
   signOut(): void {
     this.authService.signOut();
   }

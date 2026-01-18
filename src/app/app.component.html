@@ -25,8 +25,8 @@
     
     <span class="spacer"></span>
     
-    <button mat-icon-button [matMenuTriggerFor]="userMenu">
-      <mat-icon>account_circle</mat-icon>
+    <button mat-icon-button [matMenuTriggerFor]="userMenu" class="user-avatar-button">
+      <div class="user-avatar">{{ getUserInitial() }}</div>
     </button>
     
     <mat-menu #userMenu="matMenu">
@@ -40,6 +40,10 @@
       <button mat-menu-item (click)="navigateToProfile()">
         <mat-icon>settings</mat-icon>
         <span>Profile Settings</span>
+      </button>
+      <button mat-menu-item (click)="navigateTo('/help')">
+        <mat-icon>help_outline</mat-icon>
+        <span>Help</span>
       </button>
       <button mat-menu-item (click)="signOut()">
         <mat-icon>logout</mat-icon>

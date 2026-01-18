@@ -1,82 +1,134 @@
+@import '../../styles/theme';
+
 .profile-settings-container {
-  max-width: 800px;
+  max-width: 900px;
   margin: 0 auto;
-  padding: 20px;
+  padding: 40px 24px;
+  min-height: 100vh;
 }
 
 .header {
   display: flex;
   align-items: center;
   gap: 16px;
-  margin-bottom: 24px;
+  margin-bottom: 40px;
+  animation: fadeInUp 0.6s ease-out;
 
   .back-button {
-    color: rgba(0, 0, 0, 0.7);
+    color: var(--gradient-start);
+    
+    &:hover {
+      background-color: rgba(102, 126, 234, 0.1);
+    }
   }
 
   h1 {
     margin: 0;
-    font-size: 28px;
-    font-weight: 500;
+    font-size: 2.5rem;
+    font-weight: 700;
+    @include gradient-text;
+  }
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
 .content {
   display: flex;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
 }
 
 .info-card,
 .settings-card,
 .danger-card {
+  border-radius: var(--radius-xl);
+  box-shadow: var(--shadow-md);
+  transition: all 0.3s ease;
+  animation: fadeInUp 0.6s ease-out backwards;
+
+  &:nth-child(1) { animation-delay: 0.1s; }
+  &:nth-child(2) { animation-delay: 0.2s; }
+  &:nth-child(3) { animation-delay: 0.3s; }
+
+  &:hover {
+    box-shadow: var(--shadow-lg);
+  }
+
   mat-card-header {
-    margin-bottom: 16px;
+    margin-bottom: 20px;
 
     mat-icon[mat-card-avatar] {
       font-size: 40px;
       width: 40px;
       height: 40px;
       line-height: 40px;
+      @include gradient-background;
+      color: white;
+      border-radius: var(--radius-md);
     }
+  }
+
+  mat-card-title {
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text-primary);
   }
 }
 
 .info-row {
   display: flex;
   justify-content: space-between;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border-color);
 
   &:last-child {
     border-bottom: none;
   }
 
   .label {
-    font-weight: 500;
-    color: rgba(0, 0, 0, 0.6);
+    font-weight: 600;
+    color: var(--text-secondary);
   }
 
   .value {
-    color: rgba(0, 0, 0, 0.87);
+    color: var(--text-primary);
+    font-weight: 500;
   }
 }
 
 form {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 20px;
 
   .full-width {
     width: 100%;
   }
 
+  mat-form-field {
+    ::ng-deep {
+      .mat-mdc-text-field-wrapper {
+        background-color: var(--background-light);
+      }
+    }
+  }
+
   button {
+    @include button-gradient;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 8px;
-    height: 42px;
+    height: 48px;
 
     mat-icon {
       margin: 0;
@@ -95,39 +147,43 @@ form {
 }
 
 .danger-card {
-  border: 2px solid #f44336;
-  background-color: #ffebee;
+  border: 2px solid var(--accent-red);
+  background: linear-gradient(135deg, #fff5f5 0%, #ffe5e5 100%);
 
   .danger-icon {
-    color: #f44336;
+    background: var(--accent-red) !important;
   }
 
-  .danger-title {
-    color: #f44336;
+  mat-card-title {
+    color: var(--accent-red);
   }
 
   .danger-description {
-    margin-bottom: 12px;
-    color: rgba(0, 0, 0, 0.87);
+    margin-bottom: 16px;
+    color: var(--text-primary);
+    line-height: 1.6;
   }
 
   .danger-list {
-    margin: 12px 0;
-    padding-left: 20px;
-    color: rgba(0, 0, 0, 0.87);
+    margin: 16px 0;
+    padding-left: 24px;
+    color: var(--text-primary);
 
     li {
-      margin: 6px 0;
+      margin: 8px 0;
+      line-height: 1.6;
     }
   }
 
   .danger-warning {
-    margin: 16px 0;
-    padding: 12px;
+    margin: 20px 0;
+    padding: 16px;
     background-color: #fff3e0;
     border-left: 4px solid #ff9800;
+    border-radius: var(--radius-sm);
     color: #e65100;
     font-size: 14px;
+    font-weight: 500;
   }
 
   .delete-button {
@@ -135,7 +191,14 @@ form {
     align-items: center;
     justify-content: center;
     gap: 8px;
-    margin-top: 12px;
+    margin-top: 16px;
+    background: var(--accent-red);
+    height: 48px;
+
+    &:hover {
+      background: #e53935;
+      box-shadow: 0 6px 20px rgba(244, 67, 54, 0.5);
+    }
 
     mat-icon {
       margin: 0;
@@ -148,17 +211,30 @@ form {
   }
 }
 
-@media (max-width: 600px) {
+@media (max-width: 768px) {
   .profile-settings-container {
-    padding: 12px;
+    padding: 24px 16px;
   }
 
-  .header h1 {
-    font-size: 24px;
+  .header {
+    margin-bottom: 32px;
+
+    h1 {
+      font-size: 2rem;
+    }
+  }
+
+  .content {
+    gap: 24px;
   }
 
   .info-row {
     flex-direction: column;
-    gap: 4px;
+    gap: 6px;
+    padding: 12px 0;
+  }
+
+  form button {
+    height: 52px;
   }
 }

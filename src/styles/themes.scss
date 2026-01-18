@@ -3,9 +3,43 @@
 // Include the common styles for Angular Material
 @include mat.core();
 
-// Define the theme using Material's built-in palettes
-$cpsc-primary: mat.m2-define-palette(mat.$m2-blue-palette, 600);
-$cpsc-accent: mat.m2-define-palette(mat.$m2-pink-palette, 500);
+// Define custom purple palette
+$custom-purple: (
+  50: #f3f2ff,
+  100: #e5e0ff,
+  200: #cfc4ff,
+  300: #b5a3ff,
+  400: #9d87ff,
+  500: #667eea,
+  600: #5568d3,
+  700: #4451bc,
+  800: #333ba5,
+  900: #22248e,
+  A100: #b5a3ff,
+  A200: #9d87ff,
+  A400: #667eea,
+  A700: #4451bc,
+  contrast: (
+    50: rgba(black, 0.87),
+    100: rgba(black, 0.87),
+    200: rgba(black, 0.87),
+    300: white,
+    400: white,
+    500: white,
+    600: white,
+    700: white,
+    800: white,
+    900: white,
+    A100: rgba(black, 0.87),
+    A200: white,
+    A400: white,
+    A700: white,
+  )
+);
+
+// Define the theme using custom purple palette
+$cpsc-primary: mat.m2-define-palette($custom-purple, 500);
+$cpsc-accent: mat.m2-define-palette(mat.$m2-purple-palette, 500);
 $cpsc-warn: mat.m2-define-palette(mat.$m2-red-palette);
 
 // Create the theme
@@ -21,22 +55,3 @@ $cpsc-theme: mat.m2-define-light-theme((
 
 // Include theme styles for all components
 @include mat.all-component-themes($cpsc-theme);
-
-// Custom CSS variables for easy theming
-:root {
-  --primary-color: #1e88e5;
-  --primary-light: #64b5f6;
-  --primary-dark: #1565c0;
-  --accent-color: #e91e63;
-  --accent-light: #f06292;
-  --accent-dark: #c2185b;
-  --background-color: #fafafa;
-  --card-background: #ffffff;
-  --text-primary: rgba(0, 0, 0, 0.87);
-  --text-secondary: rgba(0, 0, 0, 0.54);
-  --border-color: #e0e0e0;
-  --success-color: #4caf50;
-  --error-color: #f44336;
-  --warning-color: #ff9800;
-  --info-color: #2196f3;
-}

@@ -114,6 +114,36 @@ export class AuthService {
   }
 
   /**
+   * Refresh access token using refresh token
+   */
+  refreshAccessToken(): Observable<LoginResponse> {
+    const refreshToken = this.getRefreshToken();
+    
+    if (!refreshToken) {
+      return throwError(() => new Error('No refresh token available'));
+    }
+
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/refresh-token`, { refreshToken })
+      .pipe(
+        tap(response => {
+          // Update tokens and maintain current user
+          this.storeAccessToken(response.accessToken);
+          if (response.refreshToken) {
+            this.storeRefreshToken(response.refreshToken);
+          }
+          this.isAuthenticated.set(true);
+        }),
+        catchError(error => {
+          console.error('Token refresh error:', error);
+          // If refresh fails, clear auth and redirect to login
+          this.clearAuth();
+          this.router.navigate(['/auth/sign-in']);
+          return throwError(() => error);
+        })
+      );
+  }
+
+  /**
    * Get current user profile
    */
   getUserProfile(): Observable<UserProfile> {

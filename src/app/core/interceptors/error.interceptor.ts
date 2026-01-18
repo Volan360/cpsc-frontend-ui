@@ -1,9 +1,11 @@
 import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
 import { inject } from '@angular/core';
-import { catchError, throwError } from 'rxjs';
+import { catchError, throwError, switchMap } from 'rxjs';
 import { NotificationService } from '@core/services/notification.service';
 import { AuthService } from '@core/services/auth.service';
 import { Router } from '@angular/router';
+
+let isRefreshing = false;
 
 export const errorInterceptor: HttpInterceptorFn = (req, next) => {
   const notificationService = inject(NotificationService);
@@ -19,15 +21,78 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         errorMessage = 'Unable to connect to the server. Please check your internet connection and try again.';
         notificationService.error(errorMessage);
       } else if (error.status === 401) {
-        // Unauthorized - token expired or invalid
-        errorMessage = 'Your session has expired. Please log in again.';
-        notificationService.warning(errorMessage);
-        authService.signOut();
-        router.navigate(['/login']);
+        // Unauthorized - attempt token refresh first
+        // Don't try to refresh if we're already on an auth endpoint or already refreshing
+        if (req.url.includes('/auth/') || isRefreshing) {
+          errorMessage = 'Your session has expired. Please log in again.';
+          notificationService.warning(errorMessage);
+          authService.signOut();
+          router.navigate(['/login']);
+          return throwError(() => ({
+            status: error.status,
+            message: errorMessage,
+            error: error.error
+          }));
+        }
+
+        // Attempt to refresh the token
+        isRefreshing = true;
+        return authService.refreshAccessToken().pipe(
+          switchMap(response => {
+            isRefreshing = false;
+            // Retry the original request with new token
+            const clonedReq = req.clone({
+              setHeaders: {
+                Authorization: `Bearer ${response.accessToken}`
+              }
+            });
+            return next(clonedReq);
+          }),
+          catchError(refreshError => {
+            isRefreshing = false;
+            // Refresh failed, sign out user
+            errorMessage = 'Your session has expired. Please log in again.';
+            notificationService.warning(errorMessage);
+            authService.signOut();
+            router.navigate(['/login']);
+            return throwError(() => ({
+              status: error.status,
+              message: errorMessage,
+              error: error.error
+            }));
+          })
+        );
       } else if (error.status === 403) {
-        // Forbidden
-        errorMessage = 'You do not have permission to perform this action.';
-        notificationService.error(errorMessage);
+        // Forbidden - attempt token refresh if not an auth endpoint
+        if (!req.url.includes('/auth/') && !isRefreshing) {
+          // Attempt to refresh the token
+          isRefreshing = true;
+          return authService.refreshAccessToken().pipe(
+            switchMap(response => {
+              isRefreshing = false;
+              // Retry the original request with new token
+              const clonedReq = req.clone({
+                setHeaders: {
+                  Authorization: `Bearer ${response.accessToken}`
+                }
+              });
+              return next(clonedReq);
+            }),
+            catchError(refreshError => {
+              isRefreshing = false;
+              errorMessage = 'You do not have permission to perform this action.';
+              notificationService.error(errorMessage);
+              return throwError(() => ({
+                status: error.status,
+                message: errorMessage,
+                error: error.error
+              }));
+            })
+          );
+        } else {
+          errorMessage = 'You do not have permission to perform this action.';
+          notificationService.error(errorMessage);
+        }
       } else if (error.status === 404) {
         // Not found - let the component handle this
         errorMessage = error.error?.error || 'The requested resource was not found.';
