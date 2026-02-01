@@ -34,28 +34,6 @@
         </mat-card>
       </div>
 
-      <!-- Recent Transactions -->
-      <div class="recent-transactions-section" *ngIf="recentTransactions.length > 0">
-        <h2 class="section-title">Recent Transactions</h2>
-        <mat-card class="transactions-card">
-          <div class="transaction-item" *ngFor="let transaction of recentTransactions" (click)="navigateToInstitutionDetail(transaction.institutionId)">
-            <div class="transaction-icon">
-              <mat-icon [class.positive]="transaction.type === 'DEPOSIT'" [class.negative]="transaction.type === 'WITHDRAWAL'">
-                {{ transaction.type === 'DEPOSIT' ? 'south' : 'north' }}
-              </mat-icon>
-            </div>
-            <div class="transaction-details">
-              <div class="transaction-institution">{{ getInstitutionName(transaction.institutionId) }}</div>
-              <div class="transaction-note" *ngIf="transaction.description">{{ transaction.description }}</div>
-              <div class="transaction-date">{{ transaction.transactionDate | date: 'short' }}</div>
-            </div>
-            <div class="transaction-amount" [class.positive]="transaction.type === 'DEPOSIT'" [class.negative]="transaction.type === 'WITHDRAWAL'">
-              {{ transaction.amount | currency }}
-            </div>
-          </div>
-        </mat-card>
-      </div>
-
       <!-- Quick Actions -->
       <div class="quick-actions-section">
         <h2 class="section-title">Quick Actions</h2>
@@ -144,6 +122,28 @@
             </mat-card-actions>
           </mat-card>
         </div>
+      </div>
+
+      <!-- Recent Transactions -->
+      <div class="recent-transactions-section" *ngIf="recentTransactions.length > 0" style="margin-top: 2rem;">
+        <h2 class="section-title">Recent Transactions</h2>
+        <mat-card class="transactions-card">
+          <div class="transaction-item" *ngFor="let transaction of recentTransactions" (click)="navigateToInstitutionDetail(transaction.institutionId)">
+            <div class="transaction-icon">
+              <mat-icon [class.positive]="transaction.type === 'DEPOSIT'" [class.negative]="transaction.type === 'WITHDRAWAL'">
+                {{ transaction.type === 'DEPOSIT' ? 'south' : 'north' }}
+              </mat-icon>
+            </div>
+            <div class="transaction-details">
+              <div class="transaction-institution">{{ getInstitutionName(transaction.institutionId) }}</div>
+              <div class="transaction-note" *ngIf="transaction.description">{{ transaction.description }}</div>
+              <div class="transaction-date">{{ (transaction.transactionDate * 1000) | date: 'short' }}</div>
+            </div>
+            <div class="transaction-amount" [class.positive]="transaction.type === 'DEPOSIT'" [class.negative]="transaction.type === 'WITHDRAWAL'">
+              {{ transaction.amount | currency }}
+            </div>
+          </div>
+        </mat-card>
       </div>
     </div>
 </div>

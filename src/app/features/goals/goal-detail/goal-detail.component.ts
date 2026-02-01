@@ -11,8 +11,10 @@ import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { GoalService } from '@core/services/goal.service';
 import { InstitutionService } from '@core/services/institution.service';
+import { TransactionService } from '@core/services/transaction.service';
 import { GoalResponse } from '@core/models/goal.models';
 import { InstitutionResponse } from '@core/models/institution.models';
+import { TransactionResponse } from '@core/models/transaction.models';
 import { NotificationService } from '@core/services/notification.service';
 import { formatDate, formatCurrency } from '@core/utils/date.utils';
 import { forkJoin } from 'rxjs';
@@ -41,6 +43,7 @@ import { decodeUuidFromUrl, encodeUuidForUrl } from '@core/utils/url.utils';
 export class GoalDetailComponent implements OnInit {
   goal?: GoalResponse;
   institutions: InstitutionResponse[] = [];
+  linkedTransactions: TransactionResponse[] = [];
   loading = true;
   goalId!: string;
 
@@ -49,6 +52,7 @@ export class GoalDetailComponent implements OnInit {
     private router: Router,
     private goalService: GoalService,
     private institutionService: InstitutionService,
+    private transactionService: TransactionService,
     private notificationService: NotificationService,
     private dialog: MatDialog
   ) {}
@@ -76,11 +80,51 @@ export class GoalDetailComponent implements OnInit {
           return;
         }
 
-        this.loading = false;
+        // If goal is completed, fetch transaction details
+        if (this.goal.isActive === false && this.goal.linkedTransactions && this.goal.linkedTransactions.length > 0) {
+          this.loadLinkedTransactions();
+        } else {
+          this.loading = false;
+        }
       },
       error: (error) => {
         console.error('Error loading goal:', error);
         this.notificationService.error('Failed to load goal');
+        this.loading = false;
+      }
+    });
+  }
+
+  loadLinkedTransactions(): void {
+    if (!this.goal?.linkedTransactions) {
+      this.loading = false;
+      return;
+    }
+
+    const transactionRequests = this.goal.linkedTransactions.map(transactionId => {
+      // Find which institution this transaction belongs to
+      for (const institution of this.institutions) {
+        return this.transactionService.getInstitutionTransactions(institution.institutionId);
+      }
+      return [];
+    });
+
+    // Get all transactions from all institutions
+    const institutionRequests = this.institutions.map(inst => 
+      this.transactionService.getInstitutionTransactions(inst.institutionId)
+    );
+
+    forkJoin(institutionRequests).subscribe({
+      next: (allTransactionsArrays) => {
+        // Flatten and filter for linked transaction IDs
+        const allTransactions = allTransactionsArrays.flat();
+        this.linkedTransactions = allTransactions.filter(t => 
+          this.goal?.linkedTransactions?.includes(t.transactionId)
+        );
+        this.loading = false;
+      },
+      error: (error) => {
+        console.error('Error loading transactions:', error);
         this.loading = false;
       }
     });
@@ -132,13 +176,14 @@ export class GoalDetailComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result && this.goal) {
         this.goalService.completeGoalWithWithdrawal(this.goal, this.institutions).subscribe({
-          next: () => {
+          next: (completedGoal) => {
             this.notificationService.success('Goal completed successfully');
             this.router.navigate(['/goals']);
           },
           error: (error) => {
             console.error('Error completing goal:', error);
-            this.notificationService.error('Failed to complete goal');
+            const errorMessage = error?.error?.message || 'Failed to complete goal';
+            this.notificationService.error(errorMessage);
           }
         });
       }
@@ -177,6 +222,10 @@ export class GoalDetailComponent implements OnInit {
    */
   calculateCurrentAmount(): number {
     if (!this.goal) return 0;
+    // For completed goals, show the target amount as current
+    if (this.goal.isActive === false && this.goal.targetAmount) {
+      return this.goal.targetAmount;
+    }
     return this.goalService.calculateCurrentAmount(this.goal, this.institutions);
   }
 
@@ -186,6 +235,10 @@ export class GoalDetailComponent implements OnInit {
   getProgressPercentage(): number {
     if (!this.goal?.targetAmount) {
       return 0;
+    }
+    // For completed goals, always show 100%
+    if (this.goal.isActive === false) {
+      return 100;
     }
     const current = this.calculateCurrentAmount();
     const percentage = (current / this.goal.targetAmount) * 100;
@@ -255,5 +308,13 @@ export class GoalDetailComponent implements OnInit {
 
   getLinkedInstitutionsKeys(): string[] {
     return this.goal?.linkedInstitutions ? Object.keys(this.goal.linkedInstitutions) : [];
+  }
+
+  navigateToTransactionInstitution(transaction: TransactionResponse): void {
+    this.router.navigate(['/institutions', encodeUuidForUrl(transaction.institutionId)]);
+  }
+
+  getTransactionInstitution(transaction: TransactionResponse): InstitutionResponse | undefined {
+    return this.institutions.find(i => i.institutionId === transaction.institutionId);
   }
 }

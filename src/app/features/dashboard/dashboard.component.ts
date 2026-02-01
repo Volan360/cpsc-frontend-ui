@@ -69,9 +69,9 @@ export class DashboardComponent implements OnInit {
         // Calculate total balance from all institutions
         this.totalBalance = this.institutions.reduce((sum, inst) => sum + (inst.currentBalance || 0), 0);
         
-        // Count active goals (not completed)
+        // Count active goals (isActive is not false)
         const allGoals = data.goals.goals || [];
-        this.activeGoalsCount = allGoals.filter(goal => !goal.isCompleted).length;
+        this.activeGoalsCount = allGoals.filter(goal => goal.isActive !== false).length;
         
         // Get recent transactions from all institutions
         this.loadRecentTransactions();
@@ -99,7 +99,7 @@ export class DashboardComponent implements OnInit {
         // Flatten and sort by date
         const flatTransactions = allTransactions.flat();
         this.recentTransactions = flatTransactions
-          .sort((a, b) => new Date(b.transactionDate).getTime() - new Date(a.transactionDate).getTime())
+          .sort((a, b) => new Date(b.transactionDate * 1000).getTime() - new Date(a.transactionDate * 1000).getTime())
           .slice(0, 5); // Get 5 most recent
         
         this.loading = false;

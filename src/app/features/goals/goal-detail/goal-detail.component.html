@@ -7,12 +7,12 @@
     mat-raised-button 
     class="complete-button" 
     (click)="completeGoal()"
-    *ngIf="goal && goal.targetAmount && calculateCurrentAmount() >= goal.targetAmount"
+    *ngIf="goal && goal.targetAmount && calculateCurrentAmount() >= goal.targetAmount && goal.isActive !== false"
     [disabled]="loading">
     <mat-icon>check_circle</mat-icon>
     <span class="button-text">Complete Goal</span>
   </button>
-  <button mat-raised-button color="primary" (click)="editGoal()" class="edit-button">
+  <button mat-raised-button color="primary" (click)="editGoal()" class="edit-button" *ngIf="goal?.isActive !== false">
     <mat-icon>edit</mat-icon>
     <span class="button-text">Edit Goal</span>
   </button>
@@ -30,7 +30,10 @@
   <mat-card class="goal-summary">
     <mat-card-header>
       <mat-card-title>{{ goal.name }}</mat-card-title>
-      <mat-card-subtitle>Created {{ formatDate(goal.createdAt) }}</mat-card-subtitle>
+      <mat-card-subtitle>
+        Created {{ formatDate(goal.createdAt) }}
+        <span *ngIf="goal.completedAt"> • Completed {{ formatDate(goal.completedAt * 1000) }}</span>
+      </mat-card-subtitle>
     </mat-card-header>
     
     <mat-card-content>
@@ -67,7 +70,7 @@
     </mat-card-content>
   </mat-card>
 
-  <mat-card class="linked-institutions-card">
+  <mat-card class="linked-institutions-card" *ngIf="goal.isActive !== false">
     <mat-card-header>
       <mat-card-title>Linked Institutions</mat-card-title>
     </mat-card-header>
@@ -106,6 +109,51 @@
         <div class="summary-row">
           <span class="summary-label">Total from All Institutions:</span>
           <span class="summary-value">{{ formatCurrency(calculateCurrentAmount()) }}</span>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Linked Transactions for Completed Goals -->
+  <mat-card class="linked-transactions-card" *ngIf="goal.isActive === false && linkedTransactions.length > 0">
+    <mat-card-header>
+      <mat-card-title>Goal Completion Transactions</mat-card-title>
+      <mat-card-subtitle>These withdrawal transactions were made when this goal was completed</mat-card-subtitle>
+    </mat-card-header>
+    
+    <mat-card-content>
+      <div class="transactions-list">
+        <div class="transaction-item" 
+             *ngFor="let transaction of linkedTransactions"
+             (click)="navigateToTransactionInstitution(transaction)">
+          <div class="transaction-main">
+            <div class="transaction-header">
+              <mat-icon class="transaction-icon">receipt</mat-icon>
+              <span class="transaction-amount">{{ formatCurrency(transaction.amount) }}</span>
+              <mat-chip class="type-chip withdrawal">WITHDRAWAL</mat-chip>
+            </div>
+            <div class="transaction-details">
+              <div class="detail-row" *ngIf="transaction.description">
+                <mat-icon class="detail-icon">description</mat-icon>
+                <span class="detail-text">{{ transaction.description }}</span>
+              </div>
+              <div class="detail-row">
+                <mat-icon class="detail-icon">account_balance</mat-icon>
+                <span class="detail-text">{{ getTransactionInstitution(transaction)?.institutionName || 'Unknown Institution' }}</span>
+              </div>
+              <div class="detail-row">
+                <mat-icon class="detail-icon">calendar_today</mat-icon>
+                <span class="detail-text">{{ formatDate(transaction.transactionDate * 1000) }}</span>
+              </div>
+              <div class="detail-row tags-row" *ngIf="transaction.tags && transaction.tags.length > 0">
+                <mat-icon class="detail-icon">label</mat-icon>
+                <div class="tags-container">
+                  <mat-chip *ngFor="let tag of transaction.tags" class="tag-chip">{{ tag }}</mat-chip>
+                </div>
+              </div>
+            </div>
+          </div>
+          <mat-icon class="chevron-icon">chevron_right</mat-icon>
         </div>
       </div>
     </mat-card-content>

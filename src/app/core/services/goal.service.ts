@@ -7,7 +7,8 @@ import {
   CreateGoalRequest,
   EditGoalRequest,
   GoalResponse,
-  GetGoalsResponse
+  GetGoalsResponse,
+  CompleteGoalRequest
 } from '@core/models/goal.models';
 import { InstitutionResponse } from '@core/models/institution.models';
 import { TransactionService } from './transaction.service';
@@ -63,18 +64,27 @@ export class GoalService {
   }
 
   /**
-   * Complete a goal by withdrawing the target amount from linked institutions and deleting the goal
+   * Complete a goal with specific transaction IDs
+   */
+  completeGoal(goalId: string, request: CompleteGoalRequest): Observable<GoalResponse> {
+    return this.http.post<GoalResponse>(`${this.apiUrl}/${goalId}/complete`, request);
+  }
+
+  /**
+   * Complete a goal by withdrawing the target amount from linked institutions
+   * This creates the withdrawal transactions and then calls the completeGoal endpoint
    */
   completeGoalWithWithdrawal(
     goal: GoalResponse,
     institutions: InstitutionResponse[]
-  ): Observable<void> {
+  ): Observable<GoalResponse> {
     if (!goal.linkedInstitutions || !goal.targetAmount) {
       throw new Error('Goal must have linked institutions and target amount');
     }
 
     const transactionDetails = this.calculateWithdrawalTransactions(goal, institutions);
     const transactionObservables: Observable<any>[] = [];
+    const createdTransactionIds: string[] = [];
 
     // Only create transactions for institutions with non-zero withdrawals
     for (const transaction of transactionDetails) {
@@ -92,10 +102,18 @@ export class GoalService {
       }
     }
 
-    // Execute all transactions, then delete the goal
-    return forkJoin(transactionObservables.length > 0 ? transactionObservables : [from(Promise.resolve())]).pipe(
-      switchMap(() => this.deleteGoal(goal.goalId)),
-      map(() => void 0)
+    // Execute all transactions, collect their IDs, then complete the goal
+    if (transactionObservables.length === 0) {
+      throw new Error('No transactions to create for goal completion');
+    }
+
+    return forkJoin(transactionObservables).pipe(
+      switchMap((transactions: any[]) => {
+        // Extract transaction IDs from responses
+        const transactionIds = transactions.map(t => t.transactionId);
+        // Call the completeGoal endpoint with the transaction IDs
+        return this.completeGoal(goal.goalId, { transactionIds });
+      })
     );
   }
 
@@ -103,6 +121,9 @@ export class GoalService {
    * Check if a goal can be completed (has target amount and current amount meets target)
    */
   canCompleteGoal(goal: GoalResponse, institutions: InstitutionResponse[]): boolean {
+    // Can't complete if already completed (isActive is false)
+    if (goal.isActive === false) return false;
+    
     if (!goal.targetAmount || !goal.linkedInstitutions) return false;
     
     const currentAmount = this.calculateCurrentAmount(goal, institutions);

@@ -10,6 +10,8 @@ import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatChipsModule } from '@angular/material/chips';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatTabsModule } from '@angular/material/tabs';
 import { GoalService } from '@core/services/goal.service';
 import { InstitutionService } from '@core/services/institution.service';
 import { GoalResponse } from '@core/models/goal.models';
@@ -35,19 +37,31 @@ import { encodeUuidForUrl } from '@core/utils/url.utils';
     MatSnackBarModule,
     MatDialogModule,
     MatTooltipModule,
-    MatChipsModule
+    MatChipsModule,
+    MatPaginatorModule,
+    MatTabsModule
   ],
   templateUrl: './goals-list.component.html',
   styleUrls: ['./goals-list.component.scss']
 })
 export class GoalsListComponent implements OnInit {
   goals: GoalResponse[] = [];
+  activeGoals: GoalResponse[] = [];
+  completedGoals: GoalResponse[] = [];
+  paginatedGoals: GoalResponse[] = [];
   institutions: InstitutionResponse[] = [];
   displayedColumns: string[] = ['name', 'targetAmount', 'currentAmount', 'status', 'actions', 'chevron'];
+  completedDisplayedColumns: string[] = ['name', 'targetAmount', 'completedAt', 'actions', 'chevron'];
   loading = true;
   nextToken?: string;
   private longPressTimer: any;
   private isLongPress = false;
+
+  // Tab and pagination settings
+  selectedTabIndex = 0;
+  pageSize = 10;
+  pageIndex = 0;
+  pageSizeOptions = [5, 10, 25, 50];
 
   constructor(
     private goalService: GoalService,
@@ -69,9 +83,15 @@ export class GoalsListComponent implements OnInit {
     }).subscribe({
       next: ({ goals, institutions }) => {
         this.goals = goals.goals;
+        // Separate active and completed goals
+        this.activeGoals = this.goals.filter(g => g.isActive !== false);
+        this.completedGoals = this.goals.filter(g => g.isActive === false);
         this.institutions = institutions.institutions;
         this.nextToken = goals.nextToken;
         this.loading = false;
+        
+        // Update paginated view for current tab
+        this.updatePageData();
       },
       error: (error) => {
         console.error('Error loading data:', error);
@@ -79,6 +99,33 @@ export class GoalsListComponent implements OnInit {
         this.loading = false;
       }
     });
+  }
+
+  onTabChange(index: number): void {
+    this.selectedTabIndex = index;
+    this.pageIndex = 0; // Reset to first page when switching tabs
+    this.updatePageData();
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.pageIndex = event.pageIndex;
+    this.pageSize = event.pageSize;
+    this.updatePageData();
+  }
+
+  getCurrentGoals(): GoalResponse[] {
+    return this.selectedTabIndex === 0 ? this.activeGoals : this.completedGoals;
+  }
+
+  getTotalCount(): number {
+    return this.getCurrentGoals().length;
+  }
+
+  private updatePageData(): void {
+    const currentGoals = this.getCurrentGoals();
+    const startIndex = this.pageIndex * this.pageSize;
+    const endIndex = startIndex + this.pageSize;
+    this.paginatedGoals = currentGoals.slice(startIndex, endIndex);
   }
 
   openCreateDialog(): void {
@@ -164,13 +211,14 @@ export class GoalsListComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         this.goalService.completeGoalWithWithdrawal(goal, this.institutions).subscribe({
-          next: () => {
+          next: (completedGoal) => {
             this.notificationService.success('Goal completed successfully');
             this.loadData();
           },
           error: (error) => {
             console.error('Error completing goal:', error);
-            this.notificationService.error('Failed to complete goal');
+            const errorMessage = error?.error?.message || 'Failed to complete goal';
+            this.notificationService.error(errorMessage);
           }
         });
       }
