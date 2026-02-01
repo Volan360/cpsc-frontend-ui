@@ -12,6 +12,10 @@ export interface EditGoalRequest {
   linkedInstitutions?: { [key: string]: number };
 }
 
+export interface CompleteGoalRequest {
+  transactionIds: string[];
+}
+
 export interface GoalResponse {
   goalId: string;
   name: string;
@@ -19,6 +23,9 @@ export interface GoalResponse {
   targetAmount?: number;
   linkedInstitutions?: { [key: string]: number };
   isCompleted?: boolean;
+  isActive?: boolean;
+  linkedTransactions?: string[];
+  completedAt?: number;
   createdAt: number;
   userId: string;
 }
