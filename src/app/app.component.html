@@ -4,14 +4,12 @@
       <mat-icon>menu</mat-icon>
     </button>
     
-    <span class="toolbar-title">CPSC Cornerstone</span>
+    <button class="logo-btn" (click)="navigateTo('/dashboard')" matRipple matRippleColor="rgba(255,255,255,0.12)">
+      <mat-icon class="logo-icon">account_balance_wallet</mat-icon>
+      <span class="logo-word">FullStack</span><span class="logo-word logo-word-accent">Cash</span><span class="logo-word">Track</span>
+    </button>
     
     <div class="desktop-nav">
-      <button mat-button (click)="navigateTo('/dashboard')">
-        <mat-icon>dashboard</mat-icon>
-        <span class="nav-label">Dashboard</span>
-      </button>
-      
       <button mat-button (click)="navigateTo('/institutions')">
         <mat-icon>account_balance</mat-icon>
         <span class="nav-label">Institutions</span>
@@ -20,6 +18,11 @@
       <button mat-button (click)="navigateTo('/goals')">
         <mat-icon>flag</mat-icon>
         <span class="nav-label">Goals</span>
+      </button>
+
+      <button mat-button (click)="navigateTo('/analytics')">
+        <mat-icon>insights</mat-icon>
+        <span class="nav-label">Analytics</span>
       </button>
     </div>
     
@@ -55,11 +58,6 @@
   <mat-drawer-container class="drawer-container">
     <mat-drawer #drawer mode="over" class="mobile-drawer">
       <div class="drawer-content">
-        <button mat-button class="drawer-nav-item" (click)="navigateTo('/dashboard'); drawer.close()">
-          <mat-icon>dashboard</mat-icon>
-          <span>Dashboard</span>
-        </button>
-        
         <button mat-button class="drawer-nav-item" (click)="navigateTo('/institutions'); drawer.close()">
           <mat-icon>account_balance</mat-icon>
           <span>Institutions</span>
@@ -68,6 +66,11 @@
         <button mat-button class="drawer-nav-item" (click)="navigateTo('/goals'); drawer.close()">
           <mat-icon>flag</mat-icon>
           <span>Goals</span>
+        </button>
+
+        <button mat-button class="drawer-nav-item" (click)="navigateTo('/analytics'); drawer.close()">
+          <mat-icon>insights</mat-icon>
+          <span>Analytics</span>
         </button>
       </div>
     </mat-drawer>

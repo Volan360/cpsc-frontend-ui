@@ -157,7 +157,7 @@
         <ng-container matColumnDef="completedAt">
           <th mat-header-cell *matHeaderCellDef>Completed</th>
           <td mat-cell *matCellDef="let goal">
-            {{ goal.completedAt ? formatDate(goal.completedAt * 1000) : '-' }}
+            {{ goal.completedAt ? formatDate(goal.completedAt) : '-' }}
           </td>
         </ng-container>
 
@@ -198,7 +198,7 @@
                 <span class="target" *ngIf="goal.targetAmount"> / {{ formatCurrency(goal.targetAmount) }}</span>
               </div>
               <div class="mobile-completed" *ngIf="goal.completedAt">
-                Completed: {{ formatDate(goal.completedAt * 1000) }}
+                Completed: {{ formatDate(goal.completedAt) }}
               </div>
             </div>
             <mat-icon class="mobile-chevron">chevron_right</mat-icon>

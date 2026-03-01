@@ -32,7 +32,7 @@
       <mat-card-title>{{ goal.name }}</mat-card-title>
       <mat-card-subtitle>
         Created {{ formatDate(goal.createdAt) }}
-        <span *ngIf="goal.completedAt"> • Completed {{ formatDate(goal.completedAt * 1000) }}</span>
+        <span *ngIf="goal.completedAt"> • Completed {{ formatDate(goal.completedAt) }}</span>
       </mat-card-subtitle>
     </mat-card-header>
     
@@ -143,7 +143,7 @@
               </div>
               <div class="detail-row">
                 <mat-icon class="detail-icon">calendar_today</mat-icon>
-                <span class="detail-text">{{ formatDate(transaction.transactionDate * 1000) }}</span>
+                <span class="detail-text">{{ formatDate(transaction.transactionDate) }}</span>
               </div>
               <div class="detail-row tags-row" *ngIf="transaction.tags && transaction.tags.length > 0">
                 <mat-icon class="detail-icon">label</mat-icon>

@@ -92,6 +92,11 @@
   align-items: center;
   gap: 12px;
 
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+    gap: 6px;
+  }
+
   .bar-label {
     display: flex;
     align-items: center;
@@ -134,6 +139,10 @@
     align-items: center;
     white-space: nowrap;
 
+    @media (max-width: 600px) {
+      gap: 16px;
+    }
+
     .pct {
       font-size: 13px;
       font-weight: 700;
@@ -169,10 +178,18 @@
     .table-header,
     .table-row {
       display: grid;
-      grid-template-columns: 1fr auto auto auto;
+      grid-template-columns: 1fr 110px 70px 110px;
       gap: 16px;
       padding: 10px 8px;
       align-items: center;
+
+      @media (max-width: 600px) {
+        grid-template-columns: 1fr 90px;
+
+        // Hide Count and Avg columns on mobile
+        span:nth-child(3),
+        span:nth-child(4) { display: none; }
+      }
     }
 
     .table-header {

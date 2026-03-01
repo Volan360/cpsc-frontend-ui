@@ -7,6 +7,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatRippleModule } from '@angular/material/core';
 import { AuthService } from '@core/services/auth.service';
 
 @Component({
@@ -20,13 +21,14 @@ import { AuthService } from '@core/services/auth.service';
     MatIconModule,
     MatMenuModule,
     MatDividerModule,
-    MatSidenavModule
+    MatSidenavModule,
+    MatRippleModule
   ],
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
 export class AppComponent {
-  title = 'CPSC Cornerstone';
+  title = 'Full Stack Cash Track';
   currentUser = computed(() => this.authService.currentUser());
   isAuthenticated = computed(() => this.authService.isAuthenticated());
 

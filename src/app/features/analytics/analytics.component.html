@@ -9,7 +9,7 @@
   </div>
 
   <!-- Date Range Bar -->
-  <mat-card class="date-range-card">
+  <mat-card class="date-range-card" [class.date-range-disabled]="dateRangeDisabled" [attr.inert]="dateRangeDisabled ? '' : null">
     <form [formGroup]="dateForm" (ngSubmit)="applyDates()" class="date-form">
       <span class="date-label">
         <mat-icon>date_range</mat-icon>
@@ -42,7 +42,11 @@
   </mat-card>
 
   <!-- Analytics Tabs -->
-  <mat-tab-group animationDuration="200ms" class="analytics-tabs" dynamicHeight>
+  <mat-tab-group animationDuration="200ms" class="analytics-tabs" dynamicHeight
+                 [disablePagination]="true"
+                 [class.has-scroll-left]="canScrollLeft"
+                 [class.has-scroll-right]="canScrollRight"
+                 (selectedTabChange)="onTabChange($event)">
 
     <!-- Health Score -->
     <mat-tab>

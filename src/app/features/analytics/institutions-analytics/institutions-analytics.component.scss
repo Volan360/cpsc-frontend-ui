@@ -265,3 +265,20 @@
     mat-icon { color: #ff9800; font-size: 18px; width: 18px; height: 18px; }
   }
 }
+
+// ─── Mobile ───────────────────────────────────────────────────────────────────
+@media (max-width: 600px) {
+  .institutions-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .inst-card {
+    .inst-header {
+      flex-wrap: wrap;
+    }
+
+    .txn-stats {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+}

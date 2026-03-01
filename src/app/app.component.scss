@@ -22,6 +22,42 @@
     margin-right: 32px;
   }
 
+  .logo-btn {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 6px 10px 6px 4px;
+    border-radius: 10px;
+    margin-right: 24px;
+    text-decoration: none;
+    transition: background 0.2s;
+
+    &:hover { background: rgba(255, 255, 255, 0.1); }
+
+    .logo-icon {
+      font-size: 26px;
+      width: 26px;
+      height: 26px;
+      color: rgba(255, 255, 255, 0.95);
+    }
+
+    .logo-word {
+      font-size: 17px;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: -0.3px;
+      line-height: 1;
+
+      &.logo-word-accent {
+        color: rgba(255, 220, 120, 0.95);
+        margin: 0 1px;
+      }
+    }
+  }
+
   .nav-label {
     margin-left: 8px;
   }

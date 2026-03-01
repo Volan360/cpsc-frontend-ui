@@ -33,6 +33,14 @@
   margin-bottom: 24px;
   padding: 16px 24px;
   animation: fadeInUp 0.5s ease-out 0.05s backwards;
+  transition: opacity 0.25s ease, filter 0.25s ease;
+
+  &.date-range-disabled {
+    opacity: 0.45;
+    filter: grayscale(0.4);
+    pointer-events: none;
+    user-select: none;
+  }
 }
 
 .date-form {
@@ -84,23 +92,63 @@
     .mat-mdc-tab-header {
       background: var(--background-white);
       border-bottom: 1px solid var(--border-color);
+      position: relative;
     }
 
     .mat-mdc-tab {
       min-width: 120px;
     }
 
+    @media (max-width: 600px) {
+      // Let the tab strip scroll natively on touch
+      .mat-mdc-tab-label-container {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; // Firefox
+        &::-webkit-scrollbar { display: none; } // Chrome/Safari
+      }
+
+      .mat-mdc-tab {
+        min-width: 100px;
+      }
+    }
+
     .mat-mdc-tab-body-wrapper {
       padding: 0;
     }
 
-    .mat-mdc-tab-body-content {
-      padding: 24px;
-      overflow: visible;
+  } // end ::ng-deep
 
-      @media (max-width: 600px) {
-        padding: 16px 12px;
-      }
+  // ── Scroll-edge fade indicators (mobile) ─────────────────────────────────
+  @media (max-width: 600px) {
+    &.has-scroll-left ::ng-deep .mat-mdc-tab-header::before,
+    &.has-scroll-right ::ng-deep .mat-mdc-tab-header::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 52px;
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    &.has-scroll-left ::ng-deep .mat-mdc-tab-header::before {
+      left: 0;
+      background: linear-gradient(to right, var(--background-white) 30%, transparent);
+    }
+
+    &.has-scroll-right ::ng-deep .mat-mdc-tab-header::after {
+      right: 0;
+      background: linear-gradient(to left, var(--background-white) 30%, transparent);
+    }
+  }
+
+  ::ng-deep .mat-mdc-tab-body-content {
+    padding: 24px;
+    overflow: visible;
+
+    @media (max-width: 600px) {
+      padding: 16px 12px;
     }
   }
 }
