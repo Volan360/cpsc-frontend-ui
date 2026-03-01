@@ -1,0 +1,247 @@
+@import '../../../styles/_theme';
+
+.health-score-view {
+  padding: 32px;
+  min-height: 400px;
+}
+
+// ─── Loading / Error ─────────────────────────────────────────────────────────
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  padding: 60px 0;
+  color: var(--text-secondary);
+}
+
+.error-banner {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+  background: #fff3f3;
+  border: 1px solid #ffcdd2;
+  border-radius: var(--radius-md);
+  color: var(--accent-red);
+  margin-bottom: 24px;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  padding: 60px 0;
+  color: var(--text-light);
+
+  mat-icon { font-size: 56px; width: 56px; height: 56px; }
+}
+
+// ─── Layout ───────────────────────────────────────────────────────────────────
+
+.top-row {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+// ─── Gauge Card ───────────────────────────────────────────────────────────────
+
+.gauge-card {
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.gauge-wrapper { position: relative; }
+
+.gauge-ring {
+  width: 160px;
+  height: 160px;
+  border-radius: 50%;
+  background: conic-gradient(
+    currentColor 0deg,
+    currentColor var(--angle),
+    #e9ecef var(--angle),
+    #e9ecef 360deg
+  );
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+
+  &::after {
+    content: '';
+    position: absolute;
+    width: 106px;
+    height: 106px;
+    background: white;
+    border-radius: 50%;
+  }
+
+  &.excellent { color: #4caf50; }
+  &.good      { color: #2196f3; }
+  &.fair      { color: #ff9800; }
+  &.poor      { color: #f44336; }
+}
+
+.gauge-inner {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  line-height: 1;
+}
+
+.gauge-score {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.gauge-label {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.rating-chip { justify-content: center; }
+
+.period-note {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--text-light);
+}
+
+// ─── Recommendations Card ─────────────────────────────────────────────────────
+
+.recommendations-card {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.recommendations-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+
+  li {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.95rem;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+
+  .rec-icon {
+    color: var(--accent-blue);
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+}
+
+// ─── Components Card ─────────────────────────────────────────────────────────
+
+.components-card {
+  padding: 24px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+.card-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 0 0 20px;
+  color: var(--text-primary);
+
+  mat-icon { color: var(--accent-blue); }
+}
+
+.components-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.component-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.component-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .comp-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+    color: var(--accent-purple);
+  }
+
+  .comp-name {
+    flex: 1;
+    font-weight: 500;
+    color: var(--text-primary);
+  }
+
+  .comp-weight {
+    font-size: 0.8rem;
+    color: var(--text-secondary);
+  }
+
+  .comp-score {
+    font-weight: 700;
+    font-size: 1.1rem;
+    min-width: 40px;
+    text-align: right;
+
+    &.excellent { color: #4caf50; }
+    &.good      { color: #2196f3; }
+    &.fair      { color: #ff9800; }
+    &.poor      { color: #f44336; }
+  }
+}
+
+.progress-track {
+  height: 10px;
+  background: #e9ecef;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+
+  &.excellent { background: #4caf50; }
+  &.good      { background: #2196f3; }
+  &.fair      { background: #ff9800; }
+  &.poor      { background: #f44336; }
+}

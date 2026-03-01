@@ -1,0 +1,269 @@
+@import '../../../styles/_theme';
+
+.cash-flow-container {
+  padding: 0;
+}
+
+.spinner-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  gap: 16px;
+  color: var(--text-secondary);
+}
+
+.error-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  gap: 12px;
+  color: #f44336;
+
+  mat-icon { font-size: 40px; width: 40px; height: 40px; }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 48px;
+  gap: 12px;
+  color: var(--text-secondary);
+
+  mat-icon { font-size: 48px; width: 48px; height: 48px; opacity: 0.4; }
+}
+
+.controls-row {
+  margin-bottom: 16px;
+
+  .group-select {
+    width: 160px;
+  }
+}
+
+// ─── Summary Grid ────────────────────────────────────────────────────────────
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  @include card-elevated;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  border-radius: 12px;
+  transition: transform 0.2s ease;
+
+  &:hover { transform: translateY(-2px); }
+
+  mat-icon {
+    font-size: 28px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    padding: 8px;
+  }
+
+  .stat-info {
+    display: flex;
+    flex-direction: column;
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      color: var(--text-secondary);
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+
+  &.income mat-icon { background: rgba(76, 175, 80, 0.12); color: #4caf50; }
+  &.expense mat-icon { background: rgba(244, 67, 54, 0.12); color: #f44336; }
+  &.positive mat-icon { background: rgba(33, 150, 243, 0.12); color: #2196f3; }
+  &.negative mat-icon { background: rgba(244, 67, 54, 0.12); color: #f44336; }
+  &.neutral mat-icon { background: rgba(102, 126, 234, 0.1); color: var(--gradient-start); }
+}
+
+// ─── Chart Card ──────────────────────────────────────────────────────────────
+.chart-card {
+  margin-bottom: 20px;
+  border-radius: 16px;
+
+  mat-card-title { font-size: 16px; font-weight: 600; }
+
+  .chart-legend {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 12px;
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: var(--text-secondary);
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+      }
+
+      &.deposits .dot { background: #4caf50; }
+      &.withdrawals .dot { background: #f44336; }
+      &.net .dot { background: #2196f3; }
+    }
+  }
+}
+
+.trend-chart {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+
+  .grid-line {
+    stroke: rgba(0, 0, 0, 0.08);
+    stroke-width: 1;
+    stroke-dasharray: 4 4;
+  }
+
+  .zero-line {
+    stroke: rgba(0, 0, 0, 0.25);
+    stroke-width: 1.5;
+  }
+
+  .axis-label {
+    font-size: 10px;
+    fill: #888;
+
+    &.y-label {
+      text-anchor: end;
+      dominant-baseline: middle;
+    }
+
+    &.x-label {
+      text-anchor: middle;
+      dominant-baseline: auto;
+    }
+  }
+
+  .line {
+    stroke-width: 2.5;
+    stroke-linejoin: round;
+    stroke-linecap: round;
+
+    &.deposits-line { stroke: #4caf50; }
+    &.withdrawals-line { stroke: #f44336; }
+    &.net-line { stroke: #2196f3; stroke-width: 3; }
+  }
+}
+
+.period-badges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+
+  .badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 13px;
+
+    mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+    &.best { background: rgba(76, 175, 80, 0.1); color: #4caf50; }
+    &.worst { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+    &.trend { background: rgba(102, 126, 234, 0.1); color: var(--gradient-start); }
+  }
+}
+
+// ─── Balance Card ────────────────────────────────────────────────────────────
+.balance-card {
+  margin-bottom: 20px;
+  border-radius: 16px;
+
+  .balance-row {
+    display: flex;
+    gap: 32px;
+    flex-wrap: wrap;
+  }
+
+  .balance-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+
+    .label {
+      font-size: 12px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .value {
+      font-size: 22px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+}
+
+// ─── Metrics Card ────────────────────────────────────────────────────────────
+.metrics-card {
+  margin-bottom: 20px;
+  border-radius: 16px;
+
+  .metrics-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 16px;
+  }
+
+  .metric-item {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    padding: 12px;
+    background: rgba(102, 126, 234, 0.05);
+    border-radius: 10px;
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .value {
+      font-size: 16px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+}
+
+// ─── Anomalies Table ─────────────────────────────────────────────────────────
+.anomalies-card {
+  border-radius: 16px;
+
+  .anomaly-table {
+    width: 100%;
+  }
+}

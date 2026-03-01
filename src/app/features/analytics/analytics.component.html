@@ -1,0 +1,103 @@
+<div class="analytics-container">
+
+  <!-- Page Header -->
+  <div class="page-header">
+    <div class="header-text">
+      <h1>Financial Analytics</h1>
+      <p class="subtitle">Deep insights into your financial health, spending patterns, and goal progress</p>
+    </div>
+  </div>
+
+  <!-- Date Range Bar -->
+  <mat-card class="date-range-card">
+    <form [formGroup]="dateForm" (ngSubmit)="applyDates()" class="date-form">
+      <span class="date-label">
+        <mat-icon>date_range</mat-icon>
+        Analysis Period
+      </span>
+
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>Start Date</mat-label>
+        <input matInput [matDatepicker]="startPicker" formControlName="start" />
+        <mat-datepicker-toggle matIconSuffix [for]="startPicker"></mat-datepicker-toggle>
+        <mat-datepicker #startPicker></mat-datepicker>
+      </mat-form-field>
+
+      <span class="date-sep">—</span>
+
+      <mat-form-field appearance="outline" class="date-field">
+        <mat-label>End Date</mat-label>
+        <input matInput [matDatepicker]="endPicker" formControlName="end" [max]="maxDate" />
+        <mat-datepicker-toggle matIconSuffix [for]="endPicker"></mat-datepicker-toggle>
+        <mat-datepicker #endPicker></mat-datepicker>
+      </mat-form-field>
+
+      <button mat-flat-button color="primary" type="submit" class="apply-btn">
+        <mat-icon>refresh</mat-icon> Apply
+      </button>
+      <button mat-button type="button" (click)="resetDates()" matTooltip="Reset to full test data range">
+        <mat-icon>restore</mat-icon> Reset
+      </button>
+    </form>
+  </mat-card>
+
+  <!-- Analytics Tabs -->
+  <mat-tab-group animationDuration="200ms" class="analytics-tabs" dynamicHeight>
+
+    <!-- Health Score -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">favorite</mat-icon>
+        <span>Health Score</span>
+      </ng-template>
+      <app-health-score [startDate]="startDate" [endDate]="endDate"></app-health-score>
+    </mat-tab>
+
+    <!-- Cash Flow -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">show_chart</mat-icon>
+        <span>Cash Flow</span>
+      </ng-template>
+      <app-cash-flow [startDate]="startDate" [endDate]="endDate"></app-cash-flow>
+    </mat-tab>
+
+    <!-- Spending Categories -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">pie_chart</mat-icon>
+        <span>Categories</span>
+      </ng-template>
+      <app-categories [startDate]="startDate" [endDate]="endDate"></app-categories>
+    </mat-tab>
+
+    <!-- Goals Analytics -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">flag</mat-icon>
+        <span>Goals</span>
+      </ng-template>
+      <app-goals-analytics></app-goals-analytics>
+    </mat-tab>
+
+    <!-- Institutions Analytics -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">account_balance</mat-icon>
+        <span>Institutions</span>
+      </ng-template>
+      <app-institutions-analytics [startDate]="startDate" [endDate]="endDate"></app-institutions-analytics>
+    </mat-tab>
+
+    <!-- Network Graph -->
+    <mat-tab>
+      <ng-template mat-tab-label>
+        <mat-icon class="tab-icon">hub</mat-icon>
+        <span>Network</span>
+      </ng-template>
+      <app-network></app-network>
+    </mat-tab>
+
+  </mat-tab-group>
+
+</div>

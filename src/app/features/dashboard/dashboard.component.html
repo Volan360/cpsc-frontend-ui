@@ -66,7 +66,7 @@
             </mat-card-actions>
           </mat-card>
 
-          <mat-card class="dashboard-card">
+          <mat-card class="dashboard-card" (click)="navigateToAnalytics()" style="cursor:pointer">
             <mat-card-header>
               <mat-icon mat-card-avatar class="card-icon">analytics</mat-icon>
               <mat-card-title>Analytics</mat-card-title>
@@ -76,7 +76,7 @@
               <p>Access detailed analytics and insights about your data.</p>
             </mat-card-content>
             <mat-card-actions>
-              <button mat-button color="primary">View Analytics</button>
+              <button mat-button color="primary" (click)="$event.stopPropagation(); navigateToAnalytics()">View Analytics</button>
             </mat-card-actions>
           </mat-card>
 

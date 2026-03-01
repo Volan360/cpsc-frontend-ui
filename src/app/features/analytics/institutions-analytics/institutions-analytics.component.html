@@ -1,0 +1,135 @@
+<div class="institutions-analytics-container">
+  <!-- Loading / Error -->
+  <div class="spinner-wrap" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading institution data…</p>
+  </div>
+
+  <div class="error-state" *ngIf="!loading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && data">
+
+    <!-- Portfolio Summary -->
+    <div class="portfolio-summary">
+      <div class="summary-item highlight">
+        <span class="label">Total Portfolio Balance</span>
+        <span class="big-value">{{ data.summary.total_balance | currency:'USD':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Institutions</span>
+        <span class="value">{{ data.summary.total_institutions }}</span>
+      </div>
+      <div class="summary-item" [class.pos]="data.summary.total_growth >= 0" [class.neg]="data.summary.total_growth < 0">
+        <span class="label">Total Growth</span>
+        <span class="value">{{ data.summary.total_growth | currency:'USD':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="summary-item">
+        <span class="label">Average Balance</span>
+        <span class="value">{{ data.summary.average_balance | currency:'USD':'symbol':'1.0-0' }}</span>
+      </div>
+    </div>
+
+    <!-- Institution Cards -->
+    <div class="institutions-grid">
+      <div class="inst-card" *ngFor="let inst of data.institutions">
+        <div class="inst-header">
+          <div class="inst-avatar">{{ inst.institution_name.charAt(0).toUpperCase() }}</div>
+          <div class="inst-info">
+            <span class="name">{{ inst.institution_name }}</span>
+            <span class="activity" [class]="activityClass(inst.metrics.activity_level)">
+              {{ inst.metrics.activity_level }}
+            </span>
+          </div>
+          <div class="growth-badge" [class]="growthClass(inst)">
+            <mat-icon>{{ growthIcon(inst) }}</mat-icon>
+            {{ inst.balances.growth_rate | number:'1.1-1' }}%
+          </div>
+        </div>
+
+        <!-- Balance Row -->
+        <div class="balance-row">
+          <div class="b-item">
+            <span class="lbl">Starting</span>
+            <span class="val">{{ inst.balances.starting | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="b-arrow">
+            <mat-icon [class]="growthClass(inst)">{{ growthIcon(inst) }}</mat-icon>
+          </div>
+          <div class="b-item current">
+            <span class="lbl">Current</span>
+            <span class="val">{{ inst.balances.current | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="b-item change" [class]="growthClass(inst)">
+            <span class="lbl">Change</span>
+            <span class="val">{{ inst.balances.change | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <!-- Utilization Score -->
+        <div class="utilization">
+          <div class="util-header">
+            <span class="util-label">Utilization Score</span>
+            <span class="util-val">{{ inst.metrics.utilization_score | number:'1.0-0' }}</span>
+          </div>
+          <div class="util-track">
+            <div class="util-fill" [style.width.%]="utilizationWidth(inst.metrics.utilization_score)"></div>
+          </div>
+        </div>
+
+        <!-- Transaction Stats -->
+        <div class="txn-stats">
+          <div class="txn-item">
+            <span class="t-lbl">Transactions</span>
+            <span class="t-val">{{ inst.transactions.total_count }}</span>
+          </div>
+          <div class="txn-item green">
+            <span class="t-lbl">Deposits</span>
+            <span class="t-val">{{ inst.transactions.total_deposits | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="txn-item red">
+            <span class="t-lbl">Withdrawals</span>
+            <span class="t-val">{{ inst.transactions.total_withdrawals | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="txn-item" [class.green]="inst.transactions.net_flow >= 0" [class.red]="inst.transactions.net_flow < 0">
+            <span class="t-lbl">Net Flow</span>
+            <span class="t-val">{{ inst.transactions.net_flow | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <!-- Linked Goals -->
+        <div class="goals-row" *ngIf="inst.goals.linked_count > 0">
+          <mat-icon>flag</mat-icon>
+          <span>{{ inst.goals.linked_count }} linked goal(s):</span>
+          <span class="goal-chip" *ngFor="let g of inst.goals.linked_goal_names">{{ g }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Underutilized -->
+    <mat-card class="underutilized-card" *ngIf="data.underutilized && data.underutilized.length > 0">
+      <mat-card-header>
+        <mat-card-title>Underutilized Accounts</mat-card-title>
+        <mat-card-subtitle>Institutions that could be better utilized</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="under-list">
+          <div class="under-item" *ngFor="let u of data.underutilized">
+            <mat-icon>account_balance</mat-icon>
+            <span>{{ u.institution_name }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && !error && !data">
+    <mat-icon>account_balance</mat-icon>
+    <p>Select a date range to view institution analytics.</p>
+  </div>
+</div>

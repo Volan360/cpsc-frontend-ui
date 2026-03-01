@@ -1,0 +1,223 @@
+<div class="cash-flow-container">
+  <!-- Loading / Error -->
+  <div class="spinner-wrap" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading cash flow data…</p>
+  </div>
+
+  <div class="error-state" *ngIf="!loading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && d">
+
+    <!-- Group-by selector -->
+    <div class="controls-row">
+      <mat-form-field appearance="outline" class="group-select">
+        <mat-label>Group by</mat-label>
+        <mat-select [(ngModel)]="groupBy" (ngModelChange)="load()">
+          <mat-option value="day">Day</mat-option>
+          <mat-option value="week">Week</mat-option>
+          <mat-option value="month">Month</mat-option>
+        </mat-select>
+      </mat-form-field>
+    </div>
+
+    <!-- Summary cards -->
+    <div class="summary-grid">
+      <div class="stat-card income">
+        <mat-icon>arrow_downward</mat-icon>
+        <div class="stat-info">
+          <span class="label">Total Deposits</span>
+          <span class="value">{{ d.summary.total_deposits | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="stat-card expense">
+        <mat-icon>arrow_upward</mat-icon>
+        <div class="stat-info">
+          <span class="label">Total Withdrawals</span>
+          <span class="value">{{ d.summary.total_withdrawals | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="stat-card" [class.positive]="netFlowPositive" [class.negative]="!netFlowPositive">
+        <mat-icon>{{ netFlowPositive ? 'trending_up' : 'trending_down' }}</mat-icon>
+        <div class="stat-info">
+          <span class="label">Net Cash Flow</span>
+          <span class="value">{{ d.summary.net_cash_flow | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="stat-card neutral">
+        <mat-icon>savings</mat-icon>
+        <div class="stat-info">
+          <span class="label">Savings Rate</span>
+          <span class="value">{{ d.metrics.savings_rate | number:'1.1-1' }}%</span>
+        </div>
+      </div>
+      <div class="stat-card neutral">
+        <mat-icon>local_fire_department</mat-icon>
+        <div class="stat-info">
+          <span class="label">Daily Burn Rate</span>
+          <span class="value">{{ d.metrics.daily_burn_rate | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="stat-card neutral">
+        <mat-icon>receipt_long</mat-icon>
+        <div class="stat-info">
+          <span class="label">Transactions</span>
+          <span class="value">{{ d.summary.transaction_count }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trend Chart -->
+    <mat-card class="chart-card" *ngIf="trends && trends.periods && trends.periods.length > 0">
+      <mat-card-header>
+        <mat-card-title>Cash Flow Trends</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <!-- Legend -->
+        <div class="chart-legend">
+          <span class="legend-item deposits"><span class="dot"></span>Deposits</span>
+          <span class="legend-item withdrawals"><span class="dot"></span>Withdrawals</span>
+          <span class="legend-item net"><span class="dot"></span>Net Flow</span>
+        </div>
+
+        <svg [attr.viewBox]="'0 0 ' + chartW + ' ' + chartH" class="trend-chart" preserveAspectRatio="xMidYMid meet">
+          <!-- Grid lines -->
+          <ng-container *ngFor="let t of yAxisLabels()">
+            <line [attr.x1]="chartPad" [attr.y1]="t.y" [attr.x2]="chartW - chartPad" [attr.y2]="t.y"
+                  class="grid-line" />
+            <text [attr.x]="chartPad - 4" [attr.y]="t.y + 4" class="axis-label y-label">{{ t.label }}</text>
+          </ng-container>
+
+          <!-- Zero line -->
+          <line [attr.x1]="chartPad" [attr.y1]="zeroY()" [attr.x2]="chartW - chartPad" [attr.y2]="zeroY()"
+                class="zero-line" />
+
+          <!-- X-axis labels -->
+          <ng-container *ngFor="let lbl of xAxisLabels()">
+            <text [attr.x]="lbl.x" [attr.y]="chartH - 6" class="axis-label x-label">{{ lbl.label }}</text>
+          </ng-container>
+
+          <!-- Deposits area -->
+          <polyline [attr.points]="depositsPoints()" class="line deposits-line" fill="none" />
+
+          <!-- Withdrawals area -->
+          <polyline [attr.points]="withdrawalsPoints()" class="line withdrawals-line" fill="none" />
+
+          <!-- Net flow line -->
+          <polyline [attr.points]="netFlowPoints()" class="line net-line" fill="none" />
+        </svg>
+
+        <!-- Best / worst periods -->
+        <div class="period-badges" *ngIf="trends.best_period || trends.worst_period">
+          <div class="badge best" *ngIf="trends.best_period">
+            <mat-icon>star</mat-icon>
+            Best period: <strong>{{ trends.best_period }}</strong>
+          </div>
+          <div class="badge worst" *ngIf="trends.worst_period">
+            <mat-icon>warning</mat-icon>
+            Worst period: <strong>{{ trends.worst_period }}</strong>
+          </div>
+          <div class="badge trend" *ngIf="trends.trend_direction">
+            <mat-icon>{{ trends.trend_direction === 'improving' ? 'trending_up' : (trends.trend_direction === 'declining' ? 'trending_down' : 'remove') }}</mat-icon>
+            Trend: <strong>{{ trends.trend_direction }}</strong>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Balance Info -->
+    <mat-card class="balance-card" *ngIf="d.balance">
+      <mat-card-header><mat-card-title>Balance Overview</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="balance-row">
+          <div class="balance-item">
+            <span class="label">Current Total Balance</span>
+            <span class="value">{{ d.balance.current_total | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="balance-item" *ngIf="d.balance.runway_days !== null">
+            <span class="label">Runway</span>
+            <span class="value">{{ d.balance.runway_days }} days</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Metrics Detail -->
+    <mat-card class="metrics-card">
+      <mat-card-header><mat-card-title>Detailed Metrics</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <div class="metrics-grid">
+          <div class="metric-item">
+            <span class="label">Avg Deposit</span>
+            <span class="value">{{ d.metrics.average_deposit | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Avg Withdrawal</span>
+            <span class="value">{{ d.metrics.average_withdrawal | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Median Deposit</span>
+            <span class="value">{{ d.metrics.median_deposit | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Median Withdrawal</span>
+            <span class="value">{{ d.metrics.median_withdrawal | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Deposit Volatility</span>
+            <span class="value">{{ d.metrics.deposit_volatility | number:'1.0-2' }}</span>
+          </div>
+          <div class="metric-item">
+            <span class="label">Withdrawal Volatility</span>
+            <span class="value">{{ d.metrics.withdrawal_volatility | number:'1.0-2' }}</span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Anomalies -->
+    <mat-card class="anomalies-card" *ngIf="d.anomalies && d.anomalies.length > 0">
+      <mat-card-header><mat-card-title>Detected Anomalies</mat-card-title></mat-card-header>
+      <mat-card-content>
+        <table mat-table [dataSource]="pagedAnomalies" class="anomaly-table">
+          <ng-container matColumnDef="description">
+            <th mat-header-cell *matHeaderCellDef>Description</th>
+            <td mat-cell *matCellDef="let a">{{ a.description ?? a.type ?? '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="amount">
+            <th mat-header-cell *matHeaderCellDef>Amount</th>
+            <td mat-cell *matCellDef="let a">{{ (a.amount ?? 0) | currency:'USD':'symbol':'1.0-0' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="type">
+            <th mat-header-cell *matHeaderCellDef>Type</th>
+            <td mat-cell *matCellDef="let a">{{ a.type ?? '—' }}</td>
+          </ng-container>
+          <ng-container matColumnDef="date">
+            <th mat-header-cell *matHeaderCellDef>Date</th>
+            <td mat-cell *matCellDef="let a">{{ a.date ?? '—' }}</td>
+          </ng-container>
+          <tr mat-header-row *matHeaderRowDef="anomaliesColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: anomaliesColumns;"></tr>
+        </table>
+        <mat-paginator
+          [length]="d.anomalies.length"
+          [pageSize]="anomaliesPageSize"
+          [pageSizeOptions]="anomaliesPageSizes"
+          (page)="onAnomaliesPage($event)"
+          aria-label="Anomalies pagination">
+        </mat-paginator>
+      </mat-card-content>
+    </mat-card>
+
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && !error && !d">
+    <mat-icon>bar_chart</mat-icon>
+    <p>Select a date range to view cash flow data.</p>
+  </div>
+</div>

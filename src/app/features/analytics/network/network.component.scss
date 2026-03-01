@@ -1,0 +1,207 @@
+@import '../../../styles/_theme';
+
+.network-container { padding: 0; }
+
+.spinner-wrap {
+  display: flex; flex-direction: column; align-items: center; padding: 48px; gap: 16px;
+  color: var(--text-secondary);
+}
+
+.error-state {
+  display: flex; flex-direction: column; align-items: center; padding: 48px; gap: 12px;
+  color: #f44336;
+  mat-icon { font-size: 40px; width: 40px; height: 40px; }
+}
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; padding: 48px; gap: 12px;
+  color: var(--text-secondary);
+  mat-icon { font-size: 48px; width: 48px; height: 48px; opacity: 0.4; }
+}
+
+// ─── Stats Strip ─────────────────────────────────────────────────────────────
+.stats-strip {
+  display: flex;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 16px;
+
+  .stat {
+    @include card-elevated;
+    padding: 14px 20px;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    flex: 1;
+    min-width: 90px;
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .value {
+      font-size: 20px;
+      font-weight: 700;
+      color: var(--text-primary);
+
+      &.connected.yes { color: #4caf50; }
+      &.connected:not(.yes) { color: #f44336; }
+    }
+  }
+}
+
+// ─── Legend ───────────────────────────────────────────────────────────────────
+.legend {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 16px;
+
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 13px;
+    color: var(--text-secondary);
+    font-weight: 500;
+
+    .dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    &.institution .dot { background: #4A90E2; }
+    &.goal .dot { background: #7B68EE; }
+    &.category .dot { background: #4ECDC4; }
+  }
+}
+
+// ─── SVG Graph ────────────────────────────────────────────────────────────────
+.graph-card {
+  margin-bottom: 24px;
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.network-svg {
+  width: 100%;
+  height: auto;
+  display: block;
+  cursor: default;
+
+  .edge {
+    stroke: #bbb;
+  }
+
+  .node-circle {
+    cursor: pointer;
+    transition: r 0.15s ease, opacity 0.15s;
+
+    &.hovered {
+      opacity: 0.85;
+      filter: brightness(1.15);
+    }
+  }
+
+  .node-label {
+    font-size: 10px;
+    fill: var(--text-secondary, #666);
+    pointer-events: none;
+    user-select: none;
+  }
+
+  .tooltip-title {
+    font-size: 12px;
+    font-weight: 700;
+    fill: #fff;
+  }
+
+  .tooltip-sub {
+    font-size: 10px;
+    fill: rgba(255, 255, 255, 0.75);
+  }
+}
+
+// ─── Centrality Table ─────────────────────────────────────────────────────────
+.centrality-card {
+  border-radius: 16px;
+  margin-bottom: 20px;
+
+  .centrality-table {
+    .c-header,
+    .c-row {
+      display: flex;
+      gap: 16px;
+      padding: 8px 6px;
+      align-items: center;
+
+      span { flex: 1; font-size: 12px; text-align: right; }
+      span:first-child { text-align: left; }
+    }
+
+    .c-header {
+      font-size: 11px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .c-row {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+      transition: background 0.15s;
+
+      &:hover { background: rgba(102, 126, 234, 0.04); }
+
+      .node-name { font-weight: 600; color: var(--text-primary); text-align: left !important; }
+    }
+  }
+}
+
+// ─── Communities ─────────────────────────────────────────────────────────────
+.communities-card {
+  border-radius: 16px;
+
+  .communities-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .community {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    flex-wrap: wrap;
+
+    .c-label {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      color: var(--text-secondary);
+      min-width: 70px;
+    }
+
+    .c-members {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+
+      .member {
+        font-size: 12px;
+        font-weight: 500;
+        padding: 3px 10px;
+        background: rgba(102, 126, 234, 0.1);
+        border-radius: 12px;
+        color: var(--gradient-start);
+      }
+    }
+  }
+}

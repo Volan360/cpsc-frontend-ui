@@ -1,0 +1,258 @@
+@import '../../../styles/_theme';
+
+.goals-analytics-container { padding: 0; }
+
+.spinner-wrap {
+  display: flex; flex-direction: column; align-items: center; padding: 48px; gap: 16px;
+  color: var(--text-secondary);
+}
+
+.error-state {
+  display: flex; flex-direction: column; align-items: center; padding: 48px; gap: 12px;
+  color: #f44336;
+  mat-icon { font-size: 40px; width: 40px; height: 40px; }
+}
+
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; padding: 48px; gap: 12px;
+  color: var(--text-secondary);
+  mat-icon { font-size: 48px; width: 48px; height: 48px; opacity: 0.4; }
+}
+
+// ─── Summary ─────────────────────────────────────────────────────────────────
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  @include card-elevated;
+  padding: 16px 18px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  &.overall {
+    grid-column: 1 / -1;
+    flex-direction: column;
+    align-items: flex-start;
+    background: linear-gradient(135deg, var(--gradient-start), var(--gradient-end));
+    color: #fff;
+
+    .big-number {
+      font-size: 40px;
+      font-weight: 800;
+      line-height: 1;
+    }
+
+    .label {
+      font-size: 13px;
+      font-weight: 600;
+      opacity: 0.85;
+    }
+
+    .progress-bar {
+      width: 100%;
+      height: 8px;
+      background: rgba(255, 255, 255, 0.25);
+      border-radius: 4px;
+      overflow: hidden;
+      margin-top: 8px;
+
+      .fill {
+        height: 100%;
+        background: #fff;
+        border-radius: 4px;
+        transition: width 0.6s ease;
+      }
+    }
+  }
+
+  mat-icon {
+    font-size: 24px; width: 24px; height: 24px;
+    padding: 8px;
+    border-radius: 50%;
+    background: rgba(102, 126, 234, 0.1);
+    color: var(--gradient-start);
+  }
+
+  &.active-card mat-icon { background: rgba(33, 150, 243, 0.1); color: #2196f3; }
+  &.completed-card mat-icon { background: rgba(76, 175, 80, 0.1); color: #4caf50; }
+
+  .info {
+    display: flex;
+    flex-direction: column;
+
+    .label {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--text-secondary);
+    }
+
+    .value {
+      font-size: 18px;
+      font-weight: 700;
+      color: var(--text-primary);
+    }
+  }
+}
+
+// ─── Insights Row ─────────────────────────────────────────────────────────────
+.insights-row {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+
+.insight-chip {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+
+  mat-icon { font-size: 16px; width: 16px; height: 16px; }
+
+  &.at-risk { background: rgba(244, 67, 54, 0.1); color: #f44336; }
+  &.near { background: rgba(255, 152, 0, 0.1); color: #ff9800; }
+}
+
+// ─── Goal Cards ───────────────────────────────────────────────────────────────
+.goals-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.goal-card {
+  @include card-elevated;
+  padding: 20px;
+  border-radius: 14px;
+  border-left: 4px solid var(--gradient-start);
+  transition: transform 0.2s ease;
+
+  &:hover { transform: translateX(4px); }
+
+  &.completed { border-left-color: #4caf50; }
+  &.at-risk { border-left-color: #f44336; }
+  &.near { border-left-color: #ff9800; }
+  &.active { border-left-color: #2196f3; }
+
+  .goal-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+
+    .goal-icon {
+      font-size: 22px; width: 22px; height: 22px;
+    }
+
+    .header-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+
+      .name { font-size: 16px; font-weight: 700; color: var(--text-primary); }
+      .id { font-size: 11px; color: var(--text-secondary); }
+    }
+
+    .pct-badge {
+      font-size: 18px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 8px;
+
+      &.completed { background: rgba(76, 175, 80, 0.12); color: #4caf50; }
+      &.at-risk { background: rgba(244, 67, 54, 0.12); color: #f44336; }
+      &.near { background: rgba(255, 152, 0, 0.12); color: #ff9800; }
+      &.active { background: rgba(33, 150, 243, 0.12); color: #2196f3; }
+    }
+  }
+
+  .goal-bar {
+    height: 8px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 10px;
+
+    .fill {
+      height: 100%;
+      border-radius: 4px;
+      background: var(--gradient-start);
+      transition: width 0.6s ease;
+    }
+  }
+
+  &.completed .goal-bar .fill { background: #4caf50; }
+  &.at-risk .goal-bar .fill { background: #f44336; }
+  &.near .goal-bar .fill { background: #ff9800; }
+  &.active .goal-bar .fill { background: #2196f3; }
+
+  .goal-amounts {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    font-size: 13px;
+    color: var(--text-secondary);
+    flex-wrap: wrap;
+    margin-bottom: 8px;
+
+    strong { color: var(--text-primary); }
+
+    .remaining { color: var(--text-secondary); }
+
+    .done-badge {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      color: #4caf50;
+      font-weight: 600;
+
+      mat-icon { font-size: 14px; width: 14px; height: 14px; }
+    }
+  }
+
+  .recommendation {
+    display: flex;
+    align-items: flex-start;
+    gap: 6px;
+    padding: 8px 12px;
+    background: rgba(102, 126, 234, 0.06);
+    border-radius: 8px;
+    font-size: 12px;
+    color: var(--text-secondary);
+
+    mat-icon { font-size: 14px; width: 14px; height: 14px; flex-shrink: 0; margin-top: 2px; }
+  }
+}
+
+// ─── Priorities Card ─────────────────────────────────────────────────────────
+.priorities-card {
+  border-radius: 16px;
+  margin-bottom: 24px;
+
+  .priority-list {
+    margin: 0;
+    padding-left: 20px;
+
+    li {
+      font-size: 14px;
+      color: var(--text-secondary);
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.04);
+
+      &:last-child { border-bottom: none; }
+    }
+  }
+}

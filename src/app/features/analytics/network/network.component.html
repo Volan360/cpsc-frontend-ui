@@ -1,0 +1,157 @@
+<div class="network-container">
+  <!-- Loading / Error -->
+  <div class="spinner-wrap" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Building network graph…</p>
+  </div>
+
+  <div class="error-state" *ngIf="!loading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && data">
+
+    <!-- Stats Strip -->
+    <div class="stats-strip" *ngIf="data.graph_stats">
+      <div class="stat">
+        <span class="label">Nodes</span>
+        <span class="value">{{ data.graph_stats.nodes }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Edges</span>
+        <span class="value">{{ data.graph_stats.edges }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Density</span>
+        <span class="value">{{ data.graph_stats.density | number:'1.2-2' }}</span>
+      </div>
+      <div class="stat">
+        <span class="label">Connected</span>
+        <span class="value connected" [class.yes]="data.graph_stats.is_connected">
+          {{ data.graph_stats.is_connected ? 'Yes' : 'No' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+      <span class="legend-item institution"><span class="dot"></span>Institution</span>
+      <span class="legend-item goal"><span class="dot"></span>Goal</span>
+      <span class="legend-item category"><span class="dot"></span>Category</span>
+    </div>
+
+    <!-- SVG Graph -->
+    <mat-card class="graph-card">
+      <mat-card-content>
+        <svg [attr.viewBox]="'0 0 ' + svgW + ' ' + svgH" class="network-svg" preserveAspectRatio="xMidYMid meet">
+          <!-- Edges -->
+          <g class="edges">
+            <line *ngFor="let e of getEdgePoints()"
+                  [attr.x1]="e.x1" [attr.y1]="e.y1"
+                  [attr.x2]="e.x2" [attr.y2]="e.y2"
+                  class="edge"
+                  [attr.opacity]="edgeOpacity(e.weight)"
+                  [attr.stroke-width]="edgeWidth(e.weight)" />
+          </g>
+
+          <!-- Nodes -->
+          <g class="nodes">
+            <g *ngFor="let node of nodeLayouts; trackBy: trackById"
+               class="node-group"
+               (mouseenter)="hoveredNode = node"
+               (mouseleave)="hoveredNode = null">
+
+              <!-- Shadow circle -->
+              <circle [attr.cx]="node.x" [attr.cy]="node.y"
+                      [attr.r]="node.radius + 3"
+                      [attr.fill]="nodeColor(node.nodeType)"
+                      opacity="0.15" />
+
+              <!-- Main circle -->
+              <circle [attr.cx]="node.x" [attr.cy]="node.y"
+                      [attr.r]="node.radius"
+                      [attr.fill]="nodeColor(node.nodeType)"
+                      [class.hovered]="hoveredNode?.id === node.id"
+                      class="node-circle" />
+
+              <!-- Label -->
+              <text [attr.x]="node.x" [attr.y]="node.y + node.radius + 14"
+                    class="node-label"
+                    text-anchor="middle">
+                {{ node.label.length > 14 ? node.label.slice(0, 12) + '…' : node.label }}
+              </text>
+            </g>
+          </g>
+
+          <!-- Hover Tooltip -->
+          <g *ngIf="hoveredNode" class="tooltip-group">
+            <rect [attr.x]="hoveredNode.x - 70"
+                  [attr.y]="hoveredNode.y - hoveredNode.radius - 58"
+                  width="140" height="46"
+                  rx="8" ry="8"
+                  fill="rgba(30,30,30,0.85)" />
+            <text [attr.x]="hoveredNode.x"
+                  [attr.y]="hoveredNode.y - hoveredNode.radius - 38"
+                  class="tooltip-title" text-anchor="middle">
+              {{ hoveredNode.label }}
+            </text>
+            <text [attr.x]="hoveredNode.x"
+                  [attr.y]="hoveredNode.y - hoveredNode.radius - 22"
+                  class="tooltip-sub" text-anchor="middle">
+              {{ hoveredNode.nodeType }} · ${{ hoveredNode.balance | number:'1.0-0' }}
+            </text>
+          </g>
+        </svg>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Centrality Table (if available) -->
+    <mat-card class="centrality-card" *ngIf="data.centrality && (data.centrality | keyvalue).length > 0">
+      <mat-card-header>
+        <mat-card-title>Node Centrality</mat-card-title>
+        <mat-card-subtitle>Measures of importance in the financial network</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="centrality-table">
+          <div class="c-header">
+            <span>Node</span>
+            <span *ngFor="let metric of ((data.centrality | keyvalue)[0]?.value | keyvalue)">
+              {{ metric.key }}
+            </span>
+          </div>
+          <div class="c-row" *ngFor="let entry of (data.centrality | keyvalue)">
+            <span class="node-name">{{ entry.key }}</span>
+            <span *ngFor="let val of (entry.value | keyvalue)">
+              {{ val.value | number:'1.2-3' }}
+            </span>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Communities -->
+    <mat-card class="communities-card" *ngIf="data.communities && (data.communities | keyvalue).length > 0">
+      <mat-card-header>
+        <mat-card-title>Community Clusters</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="communities-list">
+          <div class="community" *ngFor="let c of (data.communities | keyvalue)">
+            <span class="c-label">Cluster {{ c.key }}</span>
+            <div class="c-members">
+              <span class="member" *ngFor="let m of (c.value | keyvalue)">{{ m.key }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && !error && !data">
+    <mat-icon>hub</mat-icon>
+    <p>No network data available.</p>
+  </div>
+</div>

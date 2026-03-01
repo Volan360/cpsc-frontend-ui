@@ -1,0 +1,143 @@
+<div class="categories-container">
+  <!-- Loading / Error -->
+  <div class="spinner-wrap" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Loading category data…</p>
+  </div>
+
+  <div class="error-state" *ngIf="!loading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && data">
+
+    <!-- Summary Strip -->
+    <div class="summary-strip">
+      <div class="strip-item">
+        <span class="label">Total Spent</span>
+        <span class="value">{{ data.summary.total_amount | currency:'USD':'symbol':'1.0-0' }}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">Transactions</span>
+        <span class="value">{{ data.summary.transaction_count }}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">Categories</span>
+        <span class="value">{{ data.summary.unique_categories }}</span>
+      </div>
+      <div class="strip-item">
+        <span class="label">Type</span>
+        <span class="value badge">{{ data.summary.transaction_type }}</span>
+      </div>
+    </div>
+
+    <!-- Top Categories Chart -->
+    <mat-card class="chart-card">
+      <mat-card-header>
+        <mat-card-title>Spending by Category</mat-card-title>
+        <mat-card-subtitle>Top {{ topCategories.length }} categories</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="bar-list" *ngIf="topCategories.length > 0; else noCategories">
+          <div class="bar-item" *ngFor="let cat of pagedCategories; let i = index">
+            <div class="bar-label">
+              <span class="dot" [style.background]="colorFor(i)"></span>
+              <span class="name">{{ cat.category }}</span>
+            </div>
+            <div class="bar-track">
+              <div class="bar-fill"
+                   [style.width.%]="barWidth(cat.percentage)"
+                   [style.background]="colorFor(i)">
+              </div>
+            </div>
+            <div class="bar-stats">
+              <span class="pct">{{ cat.percentage | number:'1.1-1' }}%</span>
+              <span class="amt">{{ cat.total | currency:'USD':'symbol':'1.0-0' }}</span>
+              <span class="cnt">{{ cat.count }} txn</span>
+            </div>
+          </div>
+        </div>
+        <mat-paginator
+          *ngIf="topCategories.length > 0"
+          [length]="topCategories.length"
+          [pageSize]="catsPageSize"
+          [pageSizeOptions]="catsPageSizes"
+          (page)="onCatsPage($event)"
+          aria-label="Categories pagination">
+        </mat-paginator>
+        <ng-template #noCategories>
+          <p class="empty-message">No category data available for this period.</p>
+        </ng-template>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Category Detail Table (all categories from categories.totals) -->
+    <mat-card class="detail-card" *ngIf="data.categories?.totals">
+      <mat-card-header>
+        <mat-card-title>All Categories</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="detail-table">
+          <div class="table-header">
+            <span>Category</span>
+            <span>Total</span>
+            <span>Count</span>
+            <span>Avg</span>
+          </div>
+          <div class="table-row"
+               *ngFor="let key of pagedDetailEntries; let i = index">
+            <span class="category-name">
+              <span class="color-dot" [style.background]="colorFor(detailPage * detailPageSize + i)"></span>
+              {{ key.key }}
+            </span>
+            <span>{{ key.value | currency:'USD':'symbol':'1.0-0' }}</span>
+            <span>{{ data.categories.counts[key.key] }}</span>
+            <span>{{ data.categories.averages[key.key] | currency:'USD':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+        <mat-paginator
+          [length]="detailEntries.length"
+          [pageSize]="detailPageSize"
+          [pageSizeOptions]="detailPageSizes"
+          (page)="onDetailPage($event)"
+          aria-label="All categories pagination">
+        </mat-paginator>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Co-occurrences -->
+    <mat-card class="co-card" *ngIf="allCoOccurrences().length > 0">
+      <mat-card-header>
+        <mat-card-title>Frequently Co-occurring Categories</mat-card-title>
+        <mat-card-subtitle>Categories that appear together in transactions</mat-card-subtitle>
+      </mat-card-header>
+      <mat-card-content>
+        <div class="co-list">
+          <div class="co-item" *ngFor="let pair of pagedCoOccurrences">
+            <span class="cat">{{ pair.a }}</span>
+            <span class="connector">
+              <mat-icon>sync_alt</mat-icon>
+              {{ pair.weight }}×
+            </span>
+            <span class="cat">{{ pair.b }}</span>
+          </div>
+        </div>
+        <mat-paginator
+          [length]="allCoOccurrences().length"
+          [pageSize]="coPageSize"
+          [pageSizeOptions]="coPageSizes"
+          (page)="onCoPage($event)"
+          aria-label="Co-occurrences pagination">
+        </mat-paginator>
+      </mat-card-content>
+    </mat-card>
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && !error && !data">
+    <mat-icon>pie_chart</mat-icon>
+    <p>Select a date range to view spending categories.</p>
+  </div>
+</div>

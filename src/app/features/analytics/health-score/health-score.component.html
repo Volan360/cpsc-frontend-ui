@@ -1,0 +1,92 @@
+<div class="health-score-view">
+
+  <!-- Loading -->
+  <div class="loading-container" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <span>Computing your financial health score...</span>
+  </div>
+
+  <!-- Error -->
+  <div class="error-banner" *ngIf="!loading && error">
+    <mat-icon>error_outline</mat-icon>
+    <span>{{ error }}</span>
+    <button mat-button (click)="load()">Retry</button>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && data">
+
+    <!-- Top row: gauge + summary -->
+    <div class="top-row">
+
+      <!-- Gauge -->
+      <mat-card class="gauge-card">
+        <div class="gauge-wrapper">
+          <div class="gauge-ring" [ngClass]="scoreClass(data.overallScore)"
+               [style.--angle]="gaugeAngle(data.overallScore)">
+            <div class="gauge-inner">
+              <span class="gauge-score">{{ data.overallScore | number:'1.0-0' }}</span>
+              <span class="gauge-label">/ 100</span>
+            </div>
+          </div>
+        </div>
+        <mat-chip-set class="rating-chip">
+          <mat-chip [color]="ratingColor(data.rating)" highlighted>
+            {{ data.rating }}
+          </mat-chip>
+        </mat-chip-set>
+        <p class="period-note">Based on {{ data.periodDays }}-day period</p>
+      </mat-card>
+
+      <!-- Recommendations -->
+      <mat-card class="recommendations-card" *ngIf="data.recommendations?.length">
+        <h3 class="card-title">
+          <mat-icon>tips_and_updates</mat-icon> Recommendations
+        </h3>
+        <ul class="recommendations-list">
+          <li *ngFor="let rec of data.recommendations">
+            <mat-icon class="rec-icon">chevron_right</mat-icon>
+            {{ rec }}
+          </li>
+        </ul>
+      </mat-card>
+
+    </div>
+
+    <!-- Component breakdown -->
+    <mat-card class="components-card">
+      <h3 class="card-title">
+        <mat-icon>assessment</mat-icon> Score Breakdown
+      </h3>
+      <div class="components-grid">
+        <div class="component-item" *ngFor="let key of componentKeys">
+          <div class="component-header">
+            <mat-icon class="comp-icon">{{ componentIcons[key] }}</mat-icon>
+            <span class="comp-name">{{ componentLabels[key] }}</span>
+            <span class="comp-weight"
+                  [matTooltip]="'Weight: ' + ((getComponent(key)?.weight || 0) * 100 | number:'1.0-0') + '%'">
+              ×{{ (getComponent(key)?.weight || 0) * 100 | number:'1.0-0' }}%
+            </span>
+            <span class="comp-score" [ngClass]="scoreClass(getComponent(key)?.score || 0)">
+              {{ getComponent(key)?.score | number:'1.0-0' }}
+            </span>
+          </div>
+          <div class="progress-track">
+            <div class="progress-bar"
+                 [ngClass]="scoreClass(getComponent(key)?.score || 0)"
+                 [style.width.%]="getComponent(key)?.score || 0">
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card>
+
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && !error && !data">
+    <mat-icon>favorite_border</mat-icon>
+    <p>Select a date range and click Apply to compute your health score.</p>
+  </div>
+
+</div>

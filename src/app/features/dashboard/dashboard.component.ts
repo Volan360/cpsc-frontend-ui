@@ -128,6 +128,10 @@ export class DashboardComponent implements OnInit {
     this.router.navigate(['/profile-settings']);
   }
 
+  navigateToAnalytics(): void {
+    this.router.navigate(['/analytics']);
+  }
+
   navigateToHelp(): void {
     this.router.navigate(['/help']);
   }

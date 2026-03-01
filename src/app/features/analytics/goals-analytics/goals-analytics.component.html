@@ -1,0 +1,133 @@
+<div class="goals-analytics-container">
+  <!-- Loading / Error -->
+  <div class="spinner-wrap" *ngIf="loading">
+    <mat-spinner diameter="48"></mat-spinner>
+    <p>Analyzing goals…</p>
+  </div>
+
+  <div class="error-state" *ngIf="!loading && error">
+    <mat-icon>error_outline</mat-icon>
+    <p>{{ error }}</p>
+  </div>
+
+  <!-- Content -->
+  <div class="content" *ngIf="!loading && !error && data">
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="stat-card overall">
+        <div class="big-number">{{ data.summary.overall_progress | number:'1.0-0' }}%</div>
+        <span class="label">Overall Progress</span>
+        <div class="progress-bar">
+          <div class="fill" [style.width.%]="data.summary.overall_progress"></div>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>flag</mat-icon>
+        <div class="info">
+          <span class="label">Total Goals</span>
+          <span class="value">{{ data.summary.total_goals }}</span>
+        </div>
+      </div>
+      <div class="stat-card active-card">
+        <mat-icon>pending</mat-icon>
+        <div class="info">
+          <span class="label">Active</span>
+          <span class="value">{{ data.summary.active_goals }}</span>
+        </div>
+      </div>
+      <div class="stat-card completed-card">
+        <mat-icon>check_circle</mat-icon>
+        <div class="info">
+          <span class="label">Completed</span>
+          <span class="value">{{ data.summary.completed_goals }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>savings</mat-icon>
+        <div class="info">
+          <span class="label">Total Target</span>
+          <span class="value">{{ data.summary.total_target_amount | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+      <div class="stat-card">
+        <mat-icon>account_balance_wallet</mat-icon>
+        <div class="info">
+          <span class="label">Total Saved</span>
+          <span class="value">{{ data.summary.total_current_amount | currency:'USD':'symbol':'1.0-0' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Insights Alerts -->
+    <div class="insights-row">
+      <div class="insight-chip at-risk" *ngIf="data.insights.at_risk?.length">
+        <mat-icon>warning</mat-icon>
+        {{ data.insights.at_risk.length }} goal(s) at risk
+      </div>
+      <div class="insight-chip near" *ngIf="data.insights.near_completion?.length">
+        <mat-icon>bolt</mat-icon>
+        {{ data.insights.near_completion.length }} near completion
+      </div>
+    </div>
+
+    <!-- Priority Insights -->
+    <mat-card class="priorities-card" *ngIf="data.insights.priorities?.length">
+      <mat-card-header>
+        <mat-card-title>Recommended Priorities</mat-card-title>
+      </mat-card-header>
+      <mat-card-content>
+        <ol class="priority-list">
+          <li *ngFor="let p of data.insights.priorities">
+            {{ p.name ?? p }}
+          </li>
+        </ol>
+      </mat-card-content>
+    </mat-card>
+
+    <!-- Goal Cards -->
+    <div class="goals-list">
+      <div class="goal-card" *ngFor="let goal of data.goals" [class]="goalProgressClass(goal)">
+        <div class="goal-header">
+          <mat-icon class="goal-icon">{{ goalIcon(goal) }}</mat-icon>
+          <div class="header-info">
+            <span class="name">{{ goal.name }}</span>
+            <span class="id">{{ goal.goal_id }}</span>
+          </div>
+          <div class="pct-badge" [class]="goalProgressClass(goal)">
+            {{ goal.progress_percent | number:'1.0-0' }}%
+          </div>
+        </div>
+
+        <div class="goal-bar">
+          <div class="fill" [style.width.%]="goal.progress_percent"></div>
+        </div>
+
+        <div class="goal-amounts">
+          <span>
+            <strong>{{ goal.current_amount | currency:'USD':'symbol':'1.0-0' }}</strong>
+            saved of {{ goal.target_amount | currency:'USD':'symbol':'1.0-0' }}
+          </span>
+          <span class="remaining" *ngIf="!goal.is_completed">
+            {{ goal.remaining_amount | currency:'USD':'symbol':'1.0-0' }} remaining
+          </span>
+          <span class="done-badge" *ngIf="goal.is_completed">
+            <mat-icon>check</mat-icon> Complete!
+          </span>
+        </div>
+
+        <div class="recommendation" *ngIf="goal.recommendation">
+          <mat-icon>lightbulb</mat-icon>
+          <span>{{ goal.recommendation }}</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Empty state -->
+  <div class="empty-state" *ngIf="!loading && !error && !data">
+    <mat-icon>flag</mat-icon>
+    <p>No goals data available.</p>
+  </div>
+</div>
